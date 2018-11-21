@@ -1,6 +1,8 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 #include "hitable.hpp"
+#include "texture.hpp"
+
 using vec3 = geometry::vec<double,3>;
 
 vec3 random_in_unit_sphere() {
@@ -23,15 +25,15 @@ class material{
 
 class lambertian : public material {
  public:
-  lambertian(const vec3 a): albedo(a){};
-  virtual bool scatter(const geometry::Ray &r_in, const hit_record & rec, vec3 & atteunation, geometry::Ray& scattered) const {
+    lambertian(std::unique_ptr<texture> a): albedo(std::move(a)){};
+    virtual bool scatter(const geometry::Ray &r_in, const hit_record & rec, vec3 & atteunation, geometry::Ray& scattered) const {
     vec3 target = rec.p + rec.normal +  random_in_unit_sphere();
     scattered = geometry::Ray(rec.p, target - rec.p, r_in.time);
-    atteunation = albedo;
+    atteunation = albedo->value(0,0,  rec.p);
     return true;
   }
 
-    vec3 albedo;
+    std::unique_ptr<texture> albedo;
 };
 
 class metal : public material {
