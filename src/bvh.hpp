@@ -79,12 +79,12 @@ class bvhNode : public hitable
         box = surrounding_box(box_left, box_right);
     }
 
-    bool hit(const ray& r, double tmin, double tmax, hit_record & rec) const
+    bool hit(const ray& r, const double tmin, const double tmax, hit_record & rec) const
     {
         if (box.hit(r, tmin, tmax)) {
             hit_record left_rec, right_rec;
-            bool hit_left = left->hit(r, tmin, tmax, left_rec);
-            bool hit_right = right->hit(r, tmin, tmax, right_rec);
+            const bool hit_left = left->hit(r, tmin, tmax, left_rec);
+            const bool hit_right = right->hit(r, tmin, tmax, right_rec);
             if (hit_left && hit_right) {
                 if (left_rec.t < right_rec.t)
                     rec = left_rec;

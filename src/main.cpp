@@ -104,11 +104,11 @@ std::unique_ptr<bvhNode> random_scene()
 int main()
 {
     constexpr long int nx = 1000;
-    constexpr long int ny = 600;
-    constexpr long int ns = 3;
+    constexpr long int ny = 800;
+    constexpr long int ns = 20;
     std::ofstream out_file("img.ppm");
     out_file<< "P3\n"<< nx <<" "<< ny<< "\n255\n";
-    //int pixel_array[ny][nx][3];
+
 
 
     vec3 lookfrom{13,2,3};
@@ -120,48 +120,32 @@ int main()
 
     for (auto j = ny-1 ; j >= 0 ; j--)
     {
-        #pragma omp parallel for
+
         for (auto i = 0 ; i < nx ; i++)
         {
             vec3 col{0,0,0};
-
+            #pragma omp parallel for num_threads(10)
             for(auto s=0; s<ns;s++)
             {
                 double u = double(i+rand_float(e2))/double(nx);
                 double v = double(j+rand_float(e2))/double(ny);
                 geometry::Ray r=cam.get_ray(u,v);
-                col += colour(r, *world,0);
 
+                auto  c = colour(r, *world, 0);
+                #pragma omp critical
+                {
+                    col += c;
+                }
             }
             int red,g,b;
             col /= double(ns);
             red=tocolor(col[0]);
             g=tocolor(col[1]);
             b=tocolor(col[2]);
-#pragma omp ordered
+
             out_file<<red<<" "<<g<<" "<<b<<"\n";
-            {
-
-                        /*
-                pixel_array[j][i][0]=red;
-                pixel_array[j][i][1]=g;
-                pixel_array[j][i][2]=b;
-                */
-            }
-
         }
 
     }
-    /*
-    for (auto j = ny-1 ; j >= 0 ; j--)
-    {
-        for (auto i = 0 ; i < nx ; i++)
-        {
-            out_file<< pixel_array[j][i][0]<<" "
-                    <<pixel_array[j][i][1]<< " "
-                    << pixel_array[j][i][2]<< "\n";
-        }
-        }*/
-
     out_file.close();
 }

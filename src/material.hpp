@@ -27,9 +27,9 @@ class lambertian : public material {
  public:
     lambertian(std::unique_ptr<texture> a): albedo(std::move(a)){};
     virtual bool scatter(const geometry::Ray &r_in, const hit_record & rec, vec3 & atteunation, geometry::Ray& scattered) const {
-    vec3 target = rec.p + rec.normal +  random_in_unit_sphere();
-    scattered = geometry::Ray(rec.p, target - rec.p, r_in.time);
-    atteunation = albedo->value(0,0,  rec.p);
+        vec3 target = rec.p + rec.normal +  random_in_unit_sphere();
+        scattered = geometry::Ray(rec.p, target - rec.p, r_in.time);
+        atteunation = albedo->value(0,0,  rec.p);
     return true;
   }
 
