@@ -10,11 +10,11 @@ class hitable_list :public hitable
   public:
     std::vector<std::shared_ptr<hitable>> list;
     hitable_list() {}
-    bool hit(const geometry::Ray& r, double t_min, double t_max, hit_record &rec) const
+    bool hit(const geometry::Ray& r, float t_min, float t_max, hit_record &rec) const
     {
         hit_record temp_rec;
         bool hit_anything = false;
-        double closet_so_far =t_max;
+        float closet_so_far =t_max;
         for(const auto & elem: list)
         {
             if(elem->hit(r, t_min, closet_so_far, temp_rec))
@@ -26,7 +26,7 @@ class hitable_list :public hitable
         }
         return hit_anything;
     }
-    bool bounding_box(double t0, double t1, aabb& box) const
+    bool bounding_box(float t0, float t1, aabb& box) const
     {
         if (list.size()<1)
             return false;
@@ -40,7 +40,7 @@ class hitable_list :public hitable
         {
             box  = temp_box;
         }
-        for (auto i =0; i<list.size(); i++)
+        for (size_t i =0; i<list.size(); i++)
         {
             if(list[0]->bounding_box(t0, t1, temp_box))
             {

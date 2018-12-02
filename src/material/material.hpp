@@ -1,15 +1,15 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
-#include "hitable.hpp"
-#include "texture.hpp"
+#include "../hitable/hitable.hpp"
+#include "texture/texture.hpp"
 
-using vec3 = geometry::vec<double,3>;
+using vec3 = geometry::vec<float,3>;
 
 vec3 random_in_unit_sphere() {
     vec3 p;
     do
     {
-        p = 2.0*vec3{drand48(), drand48(), drand48()} -vec3{1,1,1};
+        p = 2.0*vec3{float(drand48()),float( drand48()), float(drand48())} -vec3{1,1,1};
     } while (p.square_len() >=1.0);
     return p;
 }
@@ -38,7 +38,7 @@ class lambertian : public material {
 
 class metal : public material {
   public:
-    metal(const vec3 a, double f): albedo(a){ if (f < 1) fuzz = f; else fuzz = 1; };
+    metal(const vec3 a, float f): albedo(a){ if (f < 1) fuzz = f; else fuzz = 1; };
     virtual bool scatter(const geometry::Ray &r_in, const hit_record & rec, vec3 & atteunation, geometry::Ray& scattered) const {
         vec3 reflected = reflect(r_in.direction().unit_vector(), rec.normal);
         scattered = geometry::Ray(rec.p, reflected+fuzz*random_in_unit_sphere());
@@ -47,15 +47,15 @@ class metal : public material {
     }
 
     vec3 albedo;
-    double fuzz;
+    float fuzz;
 };
 
 
-bool refract(const vec3& v, const vec3& n, double ni_over_nt, vec3& refracted)
+bool refract(const vec3& v, const vec3& n, float ni_over_nt, vec3& refracted)
 {
     vec3 uv = v.unit_vector();
-    double dt = uv.dot(n);
-    double discriminant = 1.0 - ni_over_nt * ni_over_nt*(1 - dt*dt);
+    float dt = uv.dot(n);
+    float discriminant = 1.0 - ni_over_nt * ni_over_nt*(1 - dt*dt);
     if (discriminant >0)
     {
         refracted = ni_over_nt*(uv - n*dt) - n*sqrt(discriminant);
@@ -69,17 +69,17 @@ bool refract(const vec3& v, const vec3& n, double ni_over_nt, vec3& refracted)
 class dielectric : public material
 {
   public:
-    double ref_index;
-    dielectric(double ri):ref_index(ri){}
+    float ref_index;
+    dielectric(float ri):ref_index(ri){}
     virtual bool scatter(const geometry::Ray &r_in, const hit_record& rec, vec3& atteunation, geometry::Ray& scattered) const
     {
         vec3 outward_normal;
         vec3 reflected = reflect(r_in.direction(), rec.normal);
-        double ni_over_nt;
+        float ni_over_nt;
         atteunation=vec3{1.0, 1.0, 1.0};
         vec3 refracted;
-        double cosine;
-        double reflect_prob;
+        float cosine;
+        float reflect_prob;
         if(r_in.direction().dot(rec.normal) > 0)
         {
             outward_normal = -1*rec.normal;
@@ -111,9 +111,9 @@ class dielectric : public material
         return true;
     }
 
-    static double schlick(double cosine, double ref_index)
+    static float schlick(float cosine, float ref_index)
     {
-        double r0 = (1-ref_index) / (1+ref_index);
+        float r0 = (1-ref_index) / (1+ref_index);
         r0 = r0*r0;
         return r0 +(1-r0)*pow((1-cosine),5);
     }

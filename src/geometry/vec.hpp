@@ -196,7 +196,7 @@ class vec
 };
 
 template<typename T, int c>
-constexpr vec<T,c> operator*(double n, const vec<T,c> &v)
+constexpr vec<T,c> operator*(float n, const vec<T,c> &v)
 {
     std::array<T,c> temp{};
     for(size_t i=0; i<c; i++)

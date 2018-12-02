@@ -1,18 +1,18 @@
 #ifndef HITABLE_H
 #define HITABLE_H
 
-#include "ray.hpp"
+#include "../geometry/ray.hpp"
 #include "aabb.hpp"
 #include <memory>
 
-using vec3 = geometry::vec<double,3>;
+using vec3 = geometry::vec<float, 3>;
 
 
 class material;
 
 struct hit_record
 {
-    double t;
+    float t;
     vec3 p;
     vec3 normal;
     std::shared_ptr<material> mat_ptr;
@@ -22,8 +22,8 @@ struct hit_record
 class hitable
 {
  public:
-    virtual bool hit(const geometry::Ray& r, double t_min, double t_max, hit_record &rec) const = 0;
-    virtual bool bounding_box(double t0, double t1, aabb& box) const = 0;
+    virtual bool hit(const geometry::Ray& r, float t_min, float t_max, hit_record &rec) const = 0;
+    virtual bool bounding_box(float t0, float t1, aabb& box) const = 0;
 };
 
 inline aabb surrounding_box(const aabb box0,const aabb box1)

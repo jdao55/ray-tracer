@@ -1,12 +1,12 @@
 #ifndef AABB_H
 #define AABB_H
 
-#include "vec.hpp"
-#include "ray.hpp"
+#include "../geometry/vec.hpp"
+#include "../geometry/ray.hpp"
 
-using vec3 = geometry::vec<double,3>;
-inline double ffmax(double a, double b){return a>b?a:b;}
-inline double ffmin(double a, double b){return a<b?a:b;}
+using vec3 = geometry::vec<float,3>;
+inline float ffmax(float a, float b){return a>b?a:b;}
+inline float ffmin(float a, float b){return a<b?a:b;}
 struct aabb
 {
     vec3 _min, _max;
@@ -17,9 +17,9 @@ struct aabb
     bool hit(const geometry::Ray &r, float tmin, float tmax) const {
         for (auto a =0; a<3; a++)
         {
-            double t0 = ffmin((_min[a] - r.origin()[a])/ r.direction()[a],
+            float t0 = ffmin((_min[a] - r.origin()[a])/ r.direction()[a],
                               (_max[a] - r.origin()[a])/ r.direction()[a] );
-            double t1 = ffmax((_min[a] - r.origin()[a])/ r.direction()[a],
+            float t1 = ffmax((_min[a] - r.origin()[a])/ r.direction()[a],
                               (_max[a] - r.origin()[a])/ r.direction()[a] );
             tmin = ffmin(t0, tmin);
             tmax = ffmax(t1, tmax);

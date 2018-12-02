@@ -4,7 +4,7 @@
 #include "hitable.hpp"
 #include <vector>
 #include <algorithm>
-using vec3 = geometry::vec<double,3>;
+using vec3 = geometry::vec<float,3>;
 using ray = geometry::Ray;
 using hitable_ptr = std::shared_ptr<hitable>;
 
@@ -49,7 +49,7 @@ class bvhNode : public hitable
     bvhNode(){};
 
     using hitable_iter = std::vector<hitable_ptr>::iterator;
-    bvhNode (hitable_iter list_begin,  hitable_iter list_end, double time0, double time1)
+    bvhNode (hitable_iter list_begin,  hitable_iter list_end, float time0, float time1)
     {
         int n = std::distance(list_begin, list_end);
         int axis = int(3*drand48());
@@ -79,7 +79,7 @@ class bvhNode : public hitable
         box = surrounding_box(box_left, box_right);
     }
 
-    bool hit(const ray& r, const double tmin, const double tmax, hit_record & rec) const
+    bool hit(const ray& r, const float tmin, const float tmax, hit_record & rec) const
     {
         if (box.hit(r, tmin, tmax)) {
             hit_record left_rec, right_rec;
@@ -106,7 +106,7 @@ class bvhNode : public hitable
         else return false;
     }
 
-    bool bounding_box(double t0, double t1, aabb& box1) const {
+    bool bounding_box(float t0, float t1, aabb& box1) const {
         box1=box;
         return true;
     }
