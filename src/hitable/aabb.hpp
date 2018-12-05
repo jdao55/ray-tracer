@@ -12,14 +12,14 @@ struct aabb
     vec3 _min, _max;
 
     aabb(){};
-    aabb(const vec3 &a, const vec3 &b): _min(a), _max(b){}
+    aabb(const vec3 a, const vec3 b): _min(a), _max(b){}
 
     bool hit(const geometry::Ray &r, float tmin, float tmax) const {
         for (auto a =0; a<3; a++)
         {
-            float t0 = ffmin((_min[a] - r.origin()[a])/ r.direction()[a],
+            const float t0 = ffmin((_min[a] - r.origin()[a])/ r.direction()[a],
                               (_max[a] - r.origin()[a])/ r.direction()[a] );
-            float t1 = ffmax((_min[a] - r.origin()[a])/ r.direction()[a],
+            const float t1 = ffmax((_min[a] - r.origin()[a])/ r.direction()[a],
                               (_max[a] - r.origin()[a])/ r.direction()[a] );
             tmin = ffmin(t0, tmin);
             tmax = ffmax(t1, tmax);

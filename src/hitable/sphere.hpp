@@ -15,11 +15,11 @@ class sphere: public hitable
     sphere(vec3 cen, float rad, std::shared_ptr<material> mat):center(cen), radius(rad), mat_ptr(mat){}
     bool hit (const geometry::Ray &r, float t_min, float t_max, hit_record &rec) const
     {
-        vec3 oc = r.origin() -center;
-        float a = r.direction().dot(r.direction());
-        float b = oc.dot(r.direction());
-        float c = oc.dot(oc) - radius*radius;
-        float discriminant =  b*b -a*c;
+        const vec3 oc = r.origin() -center;
+        const float a = r.direction().dot(r.direction());
+        const float b = oc.dot(r.direction());
+        const float c = oc.dot(oc) - radius*radius;
+        const float discriminant =  b*b -a*c;
         if(discriminant>0)
         {
             float temp = (-b -sqrt(discriminant))/a;

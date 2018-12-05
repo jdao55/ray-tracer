@@ -11,8 +11,8 @@ using vec3 = vec<float,3>;
 class Ray
 {
   public:
-    vec3 A;
-    vec3 B;
+    vec3 A;//origin vector
+    vec3 B;//direction vector
     float time;
 
     Ray(){};

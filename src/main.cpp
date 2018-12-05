@@ -22,18 +22,13 @@ std::mt19937 e2(rd());
 std::uniform_real_distribution<float> rand_float(0.0,1.0);
 
 
-inline uint tocolor(float n)
+inline uint tocolor(const float n)
 {
     return uint(255.99*sqrt(n));
 }
 
-inline void print_vec(const vec3 &v)
-{
-     std::cout <<v[0]<< " "<< v[1] << " " <<v[2] <<"\n";
-}
 
-
-inline vec3 colour(const geometry::Ray &r, hitable & world, int depth)
+inline vec3 colour(const geometry::Ray &r, hitable & world, int depth, const vec3 = vec3{0,0,0})
 {
     hit_record rec;
     if( world.hit(r, 0.001, MAXFLOAT, rec) )
@@ -52,8 +47,8 @@ inline vec3 colour(const geometry::Ray &r, hitable & world, int depth)
     }
     else
     {
-        vec3 unit_dir = (r.direction()).unit_vector();
-        float t = 0.5 * (unit_dir[1] + 1.0);
+        const vec3 unit_dir = (r.direction()).unit_vector();
+        const float t = 0.5 * (unit_dir[1] + 1.0);
         return (1.0-t)*vec3{1.0, 1.0, 1.0} + t *vec3{0.5, 0.7, 1.0};
     }
 }
@@ -62,7 +57,9 @@ std::unique_ptr<bvhNode> random_scene()
 {
     std::vector<hitable_ptr> spherelist;
 
-    spherelist.emplace_back(std::make_shared<sphere>( vec3{0, -1000, 0}, 1000,std::make_shared<lambertian>(std::make_unique<checker_texture>(vec3{0.9, 0.9, 0.9},vec3{0.1 ,0.1, 0.1}))));
+    spherelist.emplace_back(std::make_shared<sphere>( vec3{0, -1000, 0}, 1000,
+                                                      std::make_shared<lambertian>(
+                                                          std::make_unique<checker_texture>(vec3{0.9, 0.9, 0.9},vec3{0.1 ,0.1, 0.1}))));
     for(int a=-10; a<10; a++)
     {
         for(int  b=-10; b<10; b++)
@@ -72,13 +69,14 @@ std::unique_ptr<bvhNode> random_scene()
             if ((center - vec3{4,0.2,0}).length() > 0.9)
             {
                 if( choose_mat <0.8)
-                    spherelist.emplace_back(std::make_shared<moving_sphere>( center, center+ vec3{0, 0.5f* rand_float(e2), 0}, 0.0, 1.0, 0.2,
+                    spherelist.emplace_back(std::make_shared<moving_sphere>( center, center+ vec3{0, 0.5f* rand_float(e2), 0},
+                                                                             0.0, 1.0, 0.2,
                                                                              std::make_shared<lambertian>(
                                                                                  std::make_unique<const_texture>(
                                                                                      vec3{rand_float(e2)*rand_float(e2),
                                                                                           rand_float(e2)*rand_float(e2),
                                                                                           rand_float(e2)*rand_float(e2)}))));
-                else if( choose_mat < 0.95)
+                else if(choose_mat < 0.95)
                 {
                     spherelist.emplace_back(std::make_shared<sphere>(center, 0.2,
                                                                             std::make_shared<metal>(vec3{0.5f*(1+rand_float(e2)),
@@ -103,35 +101,34 @@ std::unique_ptr<bvhNode> random_scene()
 
 int main()
 {
-    constexpr long int nx = 600;
-    constexpr long int ny = 400;
+    constexpr long int nx = 300;
+    constexpr long int ny = 200;
     constexpr long int ns = 24;
     std::ofstream out_file("img.ppm");
     out_file<< "P3\n"<< nx <<" "<< ny<< "\n255\n";
 
 
 
-    vec3 lookfrom{13,2,3};
-    vec3 lookat{0,0,0};
-    float distance_focus = 10.0;
-    camera cam(lookfrom, lookat, vec3{0,1,0}, 20, float(nx)/float(ny), 0.00, distance_focus, 0.0, 1.0);
+    constexpr vec3 lookfrom{13,2,3};
+    constexpr vec3 lookat{0,0,0};
+    constexpr float distance_focus = 10.0;
+    const camera cam(lookfrom, lookat, vec3{0,1,0}, 20, float(nx)/float(ny), 0.00, distance_focus, 0.0, 1.0);
 
     std::unique_ptr<bvhNode> world = random_scene();
 
     for (auto j = ny-1 ; j >= 0 ; j--)
     {
-
         for (auto i = 0 ; i < nx ; i++)
         {
             vec3 col{0,0,0};
-            #pragma omp parallel for num_threads(10)
+            #pragma omp parallel for
             for(auto s=0; s<ns;s++)
             {
-                float u = float(i+rand_float(e2))/float(nx);
-                float v = float(j+rand_float(e2))/float(ny);
-                geometry::Ray r=cam.get_ray(u,v);
+                const float u = float(i+rand_float(e2))/float(nx);
+                const float v = float(j+rand_float(e2))/float(ny);
+                const geometry::Ray r=cam.get_ray(u,v);
 
-                auto  c = colour(r, *world, 0);
+                const auto c = colour(r, *world, 0);
                 #pragma omp critical
                 {
                     col += c;
@@ -142,10 +139,9 @@ int main()
             red=tocolor(col[0]);
             g=tocolor(col[1]);
             b=tocolor(col[2]);
-
             out_file<<red<<" "<<g<<" "<<b<<"\n";
-        }
 
+        }
     }
     out_file.close();
 }

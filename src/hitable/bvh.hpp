@@ -51,8 +51,8 @@ class bvhNode : public hitable
     using hitable_iter = std::vector<hitable_ptr>::iterator;
     bvhNode (hitable_iter list_begin,  hitable_iter list_end, float time0, float time1)
     {
-        int n = std::distance(list_begin, list_end);
-        int axis = int(3*drand48());
+        const int n = std::distance(list_begin, list_end);
+        const int axis = int(3*drand48());
         if (axis == 0)
             std::sort(list_begin, list_end, box_x_compare);
         else if (axis == 1){

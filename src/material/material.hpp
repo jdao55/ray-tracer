@@ -5,7 +5,7 @@
 
 using vec3 = geometry::vec<float,3>;
 
-vec3 random_in_unit_sphere() {
+inline vec3 random_in_unit_sphere() {
     vec3 p;
     do
     {
@@ -14,7 +14,7 @@ vec3 random_in_unit_sphere() {
     return p;
 }
 
-vec3 reflect (const vec3 &v, const vec3 &n)
+inline vec3 reflect (const vec3 &v, const vec3 &n)
 {
   return v - n*2*(n.dot(v));
 }
@@ -27,7 +27,7 @@ class lambertian : public material {
  public:
     lambertian(std::unique_ptr<texture> a): albedo(std::move(a)){};
     virtual bool scatter(const geometry::Ray &r_in, const hit_record & rec, vec3 & atteunation, geometry::Ray& scattered) const {
-        vec3 target = rec.p + rec.normal +  random_in_unit_sphere();
+        const vec3 target = rec.p + rec.normal +  random_in_unit_sphere();
         scattered = geometry::Ray(rec.p, target - rec.p, r_in.time);
         atteunation = albedo->value(0,0,  rec.p);
     return true;
@@ -40,7 +40,7 @@ class metal : public material {
   public:
     metal(const vec3 a, float f): albedo(a){ if (f < 1) fuzz = f; else fuzz = 1; };
     virtual bool scatter(const geometry::Ray &r_in, const hit_record & rec, vec3 & atteunation, geometry::Ray& scattered) const {
-        vec3 reflected = reflect(r_in.direction().unit_vector(), rec.normal);
+        const vec3 reflected = reflect(r_in.direction().unit_vector(), rec.normal);
         scattered = geometry::Ray(rec.p, reflected+fuzz*random_in_unit_sphere());
         atteunation = albedo;
         return (scattered.direction().dot(rec.normal)) > 0;
@@ -53,9 +53,9 @@ class metal : public material {
 
 bool refract(const vec3& v, const vec3& n, float ni_over_nt, vec3& refracted)
 {
-    vec3 uv = v.unit_vector();
-    float dt = uv.dot(n);
-    float discriminant = 1.0 - ni_over_nt * ni_over_nt*(1 - dt*dt);
+    const vec3 uv = v.unit_vector();
+    const float dt = uv.dot(n);
+    const float discriminant = 1.0 - ni_over_nt * ni_over_nt*(1 - dt*dt);
     if (discriminant >0)
     {
         refracted = ni_over_nt*(uv - n*dt) - n*sqrt(discriminant);
@@ -111,7 +111,7 @@ class dielectric : public material
         return true;
     }
 
-    static float schlick(float cosine, float ref_index)
+    float schlick(float cosine, float ref_index) const
     {
         float r0 = (1-ref_index) / (1+ref_index);
         r0 = r0*r0;
