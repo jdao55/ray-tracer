@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.0)
 project (ray-tracer)
 add_executable(ray-tracer src/main.cpp)
-target_compile_options (ray-tracer PRIVATE -std=c++17 -O3 -Wall -Wextra)
+target_compile_options (ray-tracer PRIVATE -std=c++17 -O3 -Wall -Wextra -Ofast)
 target_compile_definitions (ray-tracer PRIVATE BOOST_ERROR_CODE_HEADER_ONLY)
 target_link_libraries (ray-tracer -fopenmp)
 find_package(OpenMP)

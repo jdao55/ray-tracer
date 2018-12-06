@@ -28,6 +28,21 @@ inline uint tocolor(const float n)
 }
 
 
+std::unique_ptr<hitable_list> two_perlin()
+{
+    auto world_list = std::make_unique<hitable_list>();
+    world_list->list.emplace_back(std::make_shared<sphere>(
+        vec3{0,-1000,0},
+        1000,
+        std::make_shared<lambertian>(std::make_unique<noise_texture>(4))));
+    world_list->list.emplace_back(std::make_shared<sphere>(
+        vec3{0, 2, 0},
+        2,
+        std::make_shared<lambertian>(std::make_unique<noise_texture>(4))));
+    return world_list;
+}
+
+
 inline vec3 colour(const geometry::Ray &r, hitable & world, int depth, const vec3 = vec3{0,0,0})
 {
     hit_record rec;
@@ -101,8 +116,8 @@ std::unique_ptr<bvhNode> random_scene()
 
 int main()
 {
-    constexpr long int nx = 300;
-    constexpr long int ny = 200;
+    constexpr long int nx = 800;
+    constexpr long int ny = 500;
     constexpr long int ns = 24;
     std::ofstream out_file("img.ppm");
     out_file<< "P3\n"<< nx <<" "<< ny<< "\n255\n";
@@ -114,12 +129,13 @@ int main()
     constexpr float distance_focus = 10.0;
     const camera cam(lookfrom, lookat, vec3{0,1,0}, 20, float(nx)/float(ny), 0.00, distance_focus, 0.0, 1.0);
 
-    std::unique_ptr<bvhNode> world = random_scene();
+    std::unique_ptr<hitable_list> world = two_perlin();
 
     for (auto j = ny-1 ; j >= 0 ; j--)
     {
         for (auto i = 0 ; i < nx ; i++)
         {
+
             vec3 col{0,0,0};
             #pragma omp parallel for
             for(auto s=0; s<ns;s++)

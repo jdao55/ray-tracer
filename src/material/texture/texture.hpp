@@ -3,6 +3,7 @@
 
 #include "../../geometry/vec.hpp"
 #include <memory>
+#include "perlin.hpp"
 
 using vec3 = geometry::vec<float,3>;
 class texture
@@ -51,7 +52,16 @@ class checker_texture : public texture
     }
 };
 
-
-
+class noise_texture : public texture
+{
+  public:
+    noise_texture(float sc):scale(sc){};
+    virtual vec3 value(float u, float v, const vec3 &p) const
+    {
+        return vec3{1,1,1}*0.5*( 1 + sin(scale*p[2] + 10*noise.turb(p)));
+    }
+    perlin noise;
+    float scale;
+};
 
 #endif
