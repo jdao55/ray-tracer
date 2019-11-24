@@ -2,14 +2,17 @@
 #define CAMERA_H
 
 #include "ray.hpp"
-
+#include <random>
 using vec3 = geometry::vec<float, 3>;
 
 
 vec3 random_in_unit_disk() {
+    std::random_device rd;
+    std::mt19937 eng(rd());
+    std::uniform_real_distribution<float> rand_float(0.0,1.0);
     vec3 p;
     do {
-        p = 2.0*vec3{float(drand48()),float(drand48()),0} - vec3{1,1,0};
+        p = 2.0*vec3{rand_float(eng), rand_float(eng), rand_float(eng)} - vec3{1,1,1};
     } while (p.dot(p) >= 1.0);
     return p;
 }
@@ -23,6 +26,7 @@ class camera
     float lens_radius;
     vec3 u, v, w;
     float time0, time1;
+
 
     camera(const vec3 & lookfrom, const vec3 & lookat, const vec3 & vup, const float vfov, const float aspect,
            float aperture, float focus_dist,const float t0, const float t1):time0(t0), time1(t1)

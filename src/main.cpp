@@ -116,9 +116,9 @@ std::unique_ptr<bvhNode> random_scene()
 
 int main()
 {
-    constexpr long int nx = 800;
-    constexpr long int ny = 500;
-    constexpr long int ns = 24;
+    constexpr long int nx = 100;
+    constexpr long int ny = 50;
+    constexpr long int ns = 8;
     std::ofstream out_file("img.ppm");
     out_file<< "P3\n"<< nx <<" "<< ny<< "\n255\n";
 

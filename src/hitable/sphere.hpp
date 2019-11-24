@@ -13,7 +13,7 @@ class sphere: public hitable
     std::shared_ptr<material> mat_ptr;
     sphere() {};
     sphere(vec3 cen, float rad, std::shared_ptr<material> mat):center(cen), radius(rad), mat_ptr(mat){}
-    bool hit (const geometry::Ray &r, float t_min, float t_max, hit_record &rec) const
+    bool hit (const geometry::Ray &r,const  float t_min,const float t_max, hit_record &rec) const
     {
         const vec3 oc = r.origin() -center;
         const float a = r.direction().dot(r.direction());
