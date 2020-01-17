@@ -13,12 +13,12 @@ vec3 random_in_unit_disk() {
     vec3 p;
     do {
         p = 2.0*vec3{rand_float(eng), rand_float(eng), rand_float(eng)} - vec3{1,1,1};
-    } while (p.dot(p) >= 1.0);
+    } while (geometry::dot(p,p) >= 1.0);
     return p;
 }
 class camera
 {
-  public:
+public:
     vec3 lower_left_corner;
     vec3 horizontal;
     vec3 vertical;

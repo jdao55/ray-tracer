@@ -20,7 +20,7 @@ inline float perlin_interp(const vec3 c[2][2][2], const float u, const float v, 
                 accum += (i*uu + (1-i)*(1-uu))*
                     (j*vv + (1-j)*(1-vv))*
                     (k*ww + (1-k)*(1-ww))*
-                         (c[i][j][k].dot(weight_v));
+                    (geometry::dot(c[i][j][k], weight_v));
             }
     return accum;
 }

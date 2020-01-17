@@ -16,7 +16,7 @@ inline vec3 random_in_unit_sphere() {
 
 inline vec3 reflect (const vec3 &v, const vec3 &n)
 {
-  return v - n*2*(n.dot(v));
+    return v - n*2*(geometry::dot(n, v));
 }
 
 class material{
@@ -43,7 +43,7 @@ class metal : public material {
         const vec3 reflected = reflect(r_in.direction().unit_vector(), rec.normal);
         scattered = geometry::Ray(rec.p, reflected+fuzz*random_in_unit_sphere());
         atteunation = albedo;
-        return (scattered.direction().dot(rec.normal)) > 0;
+        return geometry::dot(scattered.direction(), rec.normal) > 0;
     }
 
     vec3 albedo;
@@ -54,7 +54,7 @@ class metal : public material {
 bool refract(const vec3& v, const vec3& n, float ni_over_nt, vec3& refracted)
 {
     const vec3 uv = v.unit_vector();
-    const float dt = uv.dot(n);
+    const float dt = geometry::dot(uv, n);
     const float discriminant = 1.0 - ni_over_nt * ni_over_nt*(1 - dt*dt);
     if (discriminant >0)
     {
@@ -80,18 +80,20 @@ class dielectric : public material
         vec3 refracted;
         float cosine;
         float reflect_prob;
-        if(r_in.direction().dot(rec.normal) > 0)
+        if(geometry::dot(r_in.direction(), rec.normal) > 0)
         {
             outward_normal = -1*rec.normal;
             ni_over_nt=ref_index;
-            cosine = r_in.direction().dot(rec.normal)/ r_in.direction().length();
+            cosine = geometry::dot(r_in.direction(), rec.normal) /
+                r_in.direction().length();
             cosine = sqrt(1-ref_index*ref_index*(1-cosine*cosine));
         }
         else
         {
             outward_normal = rec.normal;
             ni_over_nt = 1.0/ref_index;
-            cosine = -1* r_in.direction().dot(rec.normal)/ r_in.direction().length();
+            cosine = -1 * geometry::dot(r_in.direction(), rec.normal) /
+                r_in.direction().length();
         }
         if(refract(r_in.direction(), outward_normal, ni_over_nt, refracted))
         {

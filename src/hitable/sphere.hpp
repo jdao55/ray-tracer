@@ -16,9 +16,9 @@ class sphere: public hitable
     bool hit (const geometry::Ray &r,const  float t_min,const float t_max, hit_record &rec) const
     {
         const vec3 oc = r.origin() -center;
-        const float a = r.direction().dot(r.direction());
-        const float b = oc.dot(r.direction());
-        const float c = oc.dot(oc) - radius*radius;
+        const float a = geometry::dot(r.direction(), r.direction());
+        const float b = geometry::dot(oc,r.direction());
+        const float c = geometry::dot(oc,oc) - radius*radius;
         const float discriminant =  b*b -a*c;
         if(discriminant>0)
         {

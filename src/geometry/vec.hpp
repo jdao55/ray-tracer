@@ -3,219 +3,219 @@
 
 #include <cmath>
 #include <array>
+#include <cstddef>
 #include <iostream>
 namespace geometry
 {
 
-template <typename T, int n = 3 >
-class vec
-{
-  public:
-    std::array<T,n> e;
-    constexpr const vec& operator+(){return *this;}
-    constexpr const vec& operator-(){return vec{-e[0],-e[1],-e[2]};}
-    constexpr T& operator[](int i) {return e[i];}
-    constexpr T operator[](int i) const {return e[i];}
-
-    constexpr vec& operator+=(const vec &v2)
+    template <typename T, size_t n = 3>
+    class vec
     {
-        for(size_t i=0; i<n; i++)
+    public:
+        std::array<T,n> e;
+        constexpr const vec& operator+(){return *this;}
+        constexpr const vec& operator-(){return vec{-e[0],-e[1],-e[2]};}
+        constexpr T& operator[](size_t i) {return e[i];}
+        constexpr T operator[](size_t i) const {return e[i];}
+
+        constexpr vec& operator+=(const vec &v2)
         {
-            e[i]+=v2.e[i];
+            for(size_t i=0; i<n; i++)
+            {
+                e[i]+=v2.e[i];
+            }
+            return *this;
         }
-        return *this;
-    }
 
-    constexpr vec& operator-=(const vec &v2)
-    {
-       for(size_t i =0; i<n; i++)
+        constexpr vec& operator-=(const vec &v2)
         {
-            e[i]-=v2.e[i];
+            for(size_t i =0; i<n; i++)
+            {
+                e[i]-=v2.e[i];
+            }
+            return *this;
         }
-        return *this;
-    }
 
-    constexpr vec& operator*=(const vec &v2)
-    {
-     for(size_t i=0; i<n;i++)
+        constexpr vec& operator*=(const vec &v2)
         {
-            e[i]*=v2.e[i];
+            for(size_t i=0; i<n;i++)
+            {
+                e[i]*=v2.e[i];
+            }
+            return *this;
         }
-        return *this;
-    }
 
-    constexpr vec& operator/=(const vec &v2)
-    {
-       for(size_t i=0; i<n;i++)
+        constexpr vec& operator/=(const vec &v2)
         {
-            e[i]/=v2.e[i];
+            for(size_t i=0; i<n;i++)
+            {
+                e[i]/=v2.e[i];
+            }
+            return *this;
         }
-        return *this;
-    }
 
-    constexpr vec& operator*=(const T &t2)
-    {
-        for(size_t i=0; i<n;i++)
+        constexpr vec& operator*=(const T &t2)
         {
-            e[i]*=t2;
+            for(size_t i=0; i<n;i++)
+            {
+                e[i]*=t2;
+            }
+            return *this;
         }
-        return *this;
-    }
 
-    constexpr vec& operator/=(const T &t2)
-    {
-        for(size_t i=0; i<n;i++)
+        constexpr vec& operator/=(const T &t2)
         {
-            e[i]/=t2;
+            for(size_t i=0; i<n;i++)
+            {
+                e[i]/=t2;
+            }
+            return *this;
         }
-        return *this;
-    }
 
-    constexpr T length() const
-    {
-        T sum=0;
-        for(size_t i=0; i<n;i++)
+        constexpr T length() const
         {
-            sum+=e[i]*e[i];
+            T sum=0;
+            for(size_t i=0; i<n;i++)
+            {
+                sum+=e[i]*e[i];
+            }
+            return sqrt(sum);
         }
-        return sqrt(sum);
-    }
 
-    constexpr T square_len() const
-    {
-        T sum=0;
-        for(size_t i=0; i<n;i++)
+        constexpr T square_len() const
         {
-            sum+=e[i]*e[i];
+            T sum=0;
+            for(size_t i=0; i<n;i++)
+            {
+                sum+=e[i]*e[i];
+            }
+            return sum;
         }
-        return sum;
-    }
 
-    inline std::istream& operator>>(std::istream &is)
-    {
-        for(size_t i=0; i<n; i++)
+        inline std::istream& operator>>(std::istream &is)
         {
-            is >> e[i];
+            for(size_t i=0; i<n; i++)
+            {
+                is >> e[i];
+            }
+            return is;
         }
-        return is;
-    }
 
-    inline std::ostream& operator<<(std::ostream &os)
-    {
-        for(size_t i=0; i<n; i++)
+        inline std::ostream& operator<<(std::ostream &os)
         {
-            os << e[i]<<" ";
-        };
-        return os;
-    }
-
-    constexpr void make_unit_vector()
-    {
-        T k = 1.0 / sqrt(square_len());
-        for(size_t i=0; i<n; i++)
-        {
-            e[i] *= k;
+            for(size_t i=0; i<n; i++)
+            {
+                os << e[i]<<" ";
+            };
+            return os;
         }
-    }
 
-    inline vec unit_vector() const
-    {
-        return *this/length();
-    }
-
-    constexpr vec operator+(const vec &v2) const
-    {
-        std::array<T,n> temp{};
-        for(size_t i=0; i<n; i++)
+        constexpr void make_unit_vector()
         {
-            temp[i] = e[i] + v2.e[i];
+            T k = 1.0 / sqrt(square_len());
+            for(size_t i=0; i<n; i++)
+            {
+                e[i] *= k;
+            }
         }
-        return vec<T,n>{temp};
-    }
 
-    constexpr vec operator-(const vec &v2) const
-    {
-        std::array<T,n> temp{};
-        for(size_t i=0; i<n; i++)
+        inline vec unit_vector() const
         {
-            temp[i] = e[i] - v2.e[i];
+            return *this/length();
         }
-        return vec<T,n>{temp};
-    }
 
-    constexpr vec operator*(const vec &v2) const
-    {
-        std::array<T,n> temp{};
-        for(size_t i=0; i<n; i++)
+        constexpr vec operator+(const vec &v2) const
         {
-            temp[i] = e[i] * v2.e[i];
+            std::array<T,n> temp{};
+            for(size_t i=0; i<n; i++)
+            {
+                temp[i] = e[i] + v2.e[i];
+            }
+            return vec<T,n>{temp};
         }
-        return vec<T,n>{temp};
-    }
 
-    constexpr vec operator/(const vec &v2) const
-    {
-        std::array<T,n> temp{0.0};
-        for(size_t i=0; i<n; i++)
+        constexpr vec operator-(const vec &v2) const
         {
-            temp[i] = e[i] / v2.e[i];
+            std::array<T,n> temp{};
+            for(size_t i=0; i<n; i++)
+            {
+                temp[i] = e[i] - v2.e[i];
+            }
+            return vec<T,n>{temp};
         }
-        return vec<T,n>{temp};
-    }
 
-    constexpr vec operator*(const T t2) const
-    {
-        std::array<T,n> temp{};
-        for(size_t i=0; i<n; i++)
+        constexpr vec operator*(const vec &v2) const
         {
-            temp[i] = e[i] * t2;
+            std::array<T,n> temp{};
+            for(size_t i=0; i<n; i++)
+            {
+                temp[i] = e[i] * v2.e[i];
+            }
+            return vec<T,n>{temp};
         }
-        return vec<T,n>{temp};
-    }
 
-    constexpr vec operator/(const T t2) const
-    {
-        std::array<T,n> temp{};
-        for(size_t i=0; i<n; i++)
+        constexpr vec operator/(const vec &v2) const
         {
-          temp[i] = e[i] / t2;
+            std::array<T,n> temp{0.0};
+            for(size_t i=0; i<n; i++)
+            {
+                temp[i] = e[i] / v2.e[i];
+            }
+            return vec<T,n>{temp};
         }
-        return vec{temp};
+
+        constexpr vec operator*(const T t2) const
+        {
+            std::array<T,n> temp{};
+            for(size_t i=0; i<n; i++)
+            {
+                temp[i] = e[i] * t2;
+            }
+            return vec<T,n>{temp};
+        }
+
+        constexpr vec operator/(const T t2) const
+        {
+            std::array<T,n> temp{};
+            for(size_t i=0; i<n; i++)
+            {
+                temp[i] = e[i] / t2;
+            }
+            return vec{temp};
+        }
+
+
+    };
+    template<typename T, size_t c>
+    constexpr vec<T,c> operator*(float n, const vec<T,c> &v)
+    {
+        std::array<T,c> temp{};
+        for(size_t i=0; i<c; i++)
+        {
+            temp[i] = v[i] * n;
+        }
+        return vec<T,c>{temp};
     }
 
-    constexpr T dot(const vec &v2) const
+
+    template<typename T, size_t c>
+    constexpr auto dot(const vec<T,c> &v1, const vec<T,c> &v2)
     {
-        T dot_result= (e[0] * v2.e[0]);
-        for(size_t i=1; i<n; i++)
+        T dot_result= (v1.e[0] * v2.e[0]);
+        for(size_t i=1; i<c; i++)
         {
-            dot_result += (e[i] * v2.e[i]);
+            dot_result += (v1.e[i] * v2.e[i]);
         }
         return dot_result;
     }
 
-};
-
-template<typename T, int c>
-constexpr vec<T,c> operator*(float n, const vec<T,c> &v)
-{
-    std::array<T,c> temp{};
-    for(size_t i=0; i<c; i++)
+    template<typename T>
+    constexpr vec<T,3> cross(const vec<T,3> &v1, const vec<T,3> &v2)
     {
-        temp[i] = v[i] * n;
-    }
-    return vec<T,c>{temp};
-}
-
-template<typename T>
-constexpr vec<T,3> cross(const vec<T,3> &v1, const vec<T,3> &v2)
-{
-    return vec<T,3> { (v1[1] * v2.e[2] - v1.e[2] * v2.e[1]),
+        return vec<T,3> { (v1[1] * v2.e[2] - v1.e[2] * v2.e[1]),
                 (-(v1.e[0] * v2.e[2] - v1.e[2] * v2.e[0])),
                 v1.e[0] * v2.e[1] - v1.e[1] * v2.e[0] };
-}
-
-
-
+    }
 }
 
 #endif
