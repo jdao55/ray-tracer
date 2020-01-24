@@ -1,5 +1,5 @@
 # ray-tracer
-A simple ray tracer
+A simple ray tracer implementation
 
 ## Build
 - clone directory
