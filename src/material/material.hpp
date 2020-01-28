@@ -1,6 +1,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 #include "../hitable/hitable.hpp"
+#include "../util.hpp"
 #include "texture/texture.hpp"
 
 using vec3 = geometry::vec<float,3>;
@@ -9,7 +10,7 @@ inline vec3 random_in_unit_sphere() {
     vec3 p;
     do
     {
-        p = 2.0*vec3{float(drand48()),float( drand48()), float(drand48())} -vec3{1,1,1};
+        p = 2.0*vec3{float(random_float()),float( random_float()), float(random_float())} -vec3{1,1,1};
     } while (p.square_len() >=1.0);
     return p;
 }
@@ -103,7 +104,7 @@ class dielectric : public material
         {
             reflect_prob=1.0;
         }
-        if(drand48() < reflect_prob)
+        if(random_float() < reflect_prob)
         {
             scattered = geometry::Ray{rec.p, reflected};
         }

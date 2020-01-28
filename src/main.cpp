@@ -10,16 +10,12 @@
 #include "hitable/moving_sphere.hpp"
 #include "hitable/hitable_list.hpp"
 #include "float.h"
+#include "util.hpp"
 #include "hitable/bvh.hpp"
 #include "material/material.hpp"
 
 using vec3 = geometry::vec<float,3>;
 using hitable_ptr = std::shared_ptr<hitable>;
-
-
-std::random_device rd;
-std::mt19937 e2(rd());
-std::uniform_real_distribution<float> rand_float(0.0,1.0);
 
 
 inline uint tocolor(const float n)
@@ -79,25 +75,25 @@ std::unique_ptr<bvhNode> random_scene()
     {
         for(int  b=-10; b<10; b++)
         {
-            float choose_mat = rand_float(e2);
-            vec3 center{a+0.9f*rand_float(e2), 0.2, b+0.9f*rand_float(e2)};
+            float choose_mat = random_float();
+            vec3 center{a+0.9f*random_float(), 0.2, b+0.9f*random_float()};
             if ((center - vec3{4,0.2,0}).length() > 0.9)
             {
                 if( choose_mat <0.8)
-                    spherelist.emplace_back(std::make_shared<moving_sphere>( center, center+ vec3{0, 0.5f* rand_float(e2), 0},
+                    spherelist.emplace_back(std::make_shared<moving_sphere>( center, center+ vec3{0, 0.5f* random_float(), 0},
                                                                              0.0, 1.0, 0.2,
                                                                              std::make_shared<lambertian>(
                                                                                  std::make_unique<const_texture>(
-                                                                                     vec3{rand_float(e2)*rand_float(e2),
-                                                                                          rand_float(e2)*rand_float(e2),
-                                                                                          rand_float(e2)*rand_float(e2)}))));
+                                                                                     vec3{random_float()*random_float(),
+                                                                                          random_float()*random_float(),
+                                                                                          random_float()*random_float()}))));
                 else if(choose_mat < 0.95)
                 {
                     spherelist.emplace_back(std::make_shared<sphere>(center, 0.2,
-                                                                            std::make_shared<metal>(vec3{0.5f*(1+rand_float(e2)),
-                                                                                                         0.5f*(1+rand_float(e2)),
-                                                                                                         0.5f*(1+rand_float(e2))},
-                                                                                0.5*rand_float(e2))));
+                                                                            std::make_shared<metal>(vec3{0.5f*(1+random_float()),
+                                                                                                         0.5f*(1+random_float()),
+                                                                                                         0.5f*(1+random_float())},
+                                                                                0.5*random_float())));
                 }
                 else {
                     spherelist.emplace_back(std::make_shared<sphere>( center, 0.2, std::make_shared<dielectric>(1.5)));
@@ -140,8 +136,8 @@ int main()
             #pragma omp parallel for
             for(auto s=0; s<ns;s++)
             {
-                const float u = float(i+rand_float(e2))/float(nx);
-                const float v = float(j+rand_float(e2))/float(ny);
+                const float u = float(i+random_float())/float(nx);
+                const float v = float(j+random_float())/float(ny);
                 const geometry::Ray r=cam.get_ray(u,v);
 
                 const auto c = colour(r, *world, 0);

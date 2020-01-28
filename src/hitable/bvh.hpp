@@ -2,6 +2,7 @@
 #define BVH_H
 
 #include "hitable.hpp"
+#include "../util.hpp"
 #include <vector>
 #include <algorithm>
 using vec3 = geometry::vec<float,3>;
@@ -52,7 +53,7 @@ class bvhNode : public hitable
     bvhNode (hitable_iter list_begin,  hitable_iter list_end, float time0, float time1)
     {
         const int n = std::distance(list_begin, list_end);
-        const int axis = int(3*drand48());
+        const int axis = int(3*random_float());
         if (axis == 0)
             std::sort(list_begin, list_end, box_x_compare);
         else if (axis == 1){

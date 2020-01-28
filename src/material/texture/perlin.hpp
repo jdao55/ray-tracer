@@ -2,6 +2,7 @@
 #define PERLIN_H
 
 #include "../../geometry/vec.hpp"
+#include "../../util.hpp"
 #include <random>
 #include <array>
 
@@ -66,12 +67,9 @@ class perlin {
 };
 
 static vec3* perlin_generate() {
-    std::random_device rd;
-    std::mt19937 e2(rd());
-    std::uniform_real_distribution<float> rand_float(0.0,1.0);
     vec3 * p = new vec3[256];
     for ( int i = 0; i < 256; ++i )
-        p[i] = vec3{-1 + 2*rand_float(e2), -1 + 2*rand_float(e2), -1 + 2*rand_float(e2)};
+        p[i] = vec3{-1 + 2*random_float(), -1 + 2*random_float(), -1 + 2*random_float()};
     return p;
 }
 
@@ -80,7 +78,7 @@ void permute(int *p, int n) {
      std::mt19937 e2(rd());
      std::uniform_real_distribution<float> rand_float(0.0,1.0);
      for (int i = n-1; i > 0; i--) {
-        int target = int(rand_float(e2)*(i+1));
+        int target = int(random_float()*(i+1));
         int tmp = p[i];
         p[i] = p[target];
         p[target] = tmp;
