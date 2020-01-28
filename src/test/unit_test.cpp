@@ -44,3 +44,21 @@ TEST(vec_test, operation_div)
     EXPECT_EQ(c[1], -1);
     EXPECT_EQ(c[2], 0);
 }
+
+TEST(vec_test, operation_dot)
+{
+    geometry::vec<int> a3{6, 4 ,0};
+    geometry::vec<int> b3{5, -3, 3};
+
+    EXPECT_EQ(geometry::dot(a3,b3), 18);
+
+    geometry::vec<int, 1> a1{6};
+    geometry::vec<int, 1> b1{5};
+    EXPECT_EQ(geometry::dot(a1,b1), 30);
+
+    geometry::vec<int, 5> a5{6, 1, -2 , 4 , 21};
+    geometry::vec<int, 5> b5{5, -2, 0, 22, -123};
+    EXPECT_EQ(geometry::dot(a5,b5), -2467);
+
+
+}
