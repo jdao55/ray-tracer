@@ -112,8 +112,8 @@ std::unique_ptr<bvhNode> random_scene()
 
 int main()
 {
-    constexpr long int nx = 100;
-    constexpr long int ny = 50;
+    constexpr long int nx = 800;
+    constexpr long int ny = 500;
     constexpr long int ns = 8;
     std::ofstream out_file("img.ppm");
     out_file<< "P3\n"<< nx <<" "<< ny<< "\n255\n";
@@ -125,7 +125,7 @@ int main()
     constexpr float distance_focus = 10.0;
     const camera cam(lookfrom, lookat, vec3{0,1,0}, 20, float(nx)/float(ny), 0.00, distance_focus, 0.0, 1.0);
 
-    std::unique_ptr<hitable_list> world = two_perlin();
+    std::unique_ptr<hitable> world = random_scene();
 
     for (auto j = ny-1 ; j >= 0 ; j--)
     {

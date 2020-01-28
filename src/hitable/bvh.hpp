@@ -107,7 +107,7 @@ class bvhNode : public hitable
         else return false;
     }
 
-    bool bounding_box(float t0, float t1, aabb& box1) const {
+    bool bounding_box([[maybe_unused]] float t0, [[maybe_unused]] float t1, aabb& box1) const {
         box1=box;
         return true;
     }

@@ -19,7 +19,7 @@ class const_texture : public  texture
 
     const_texture(){}
     const_texture(const vec3 c) :colour(c){}
-    virtual vec3 value(float u, float v, const vec3 &p) const
+    virtual vec3 value([[maybe_unused]] float u, [[maybe_unused]] float v,[[maybe_unused]]  const vec3 &p) const
     {
         return colour;
     }
@@ -56,7 +56,7 @@ class noise_texture : public texture
 {
   public:
     noise_texture(float sc):scale(sc){};
-    virtual vec3 value(float u, float v, const vec3 &p) const
+    virtual vec3 value([[maybe_unused]] float u, [[maybe_unused]] float v,[[maybe_unused]]  const vec3 &p) const
     {
         return vec3{1,1,1}*0.5*( 1 + sin(scale*p[2] + 10*noise.turb(p)));
     }
