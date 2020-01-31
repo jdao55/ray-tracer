@@ -74,37 +74,37 @@ std::unique_ptr<bvhNode> random_scene()
     spherelist.emplace_back(std::make_shared<sphere>( vec3{0, -1000, 0}, 1000,
                                                       std::make_shared<lambertian>(
                                                           std::make_unique<checker_texture>(vec3{0.9, 0.9, 0.9},vec3{0.1 ,0.1, 0.1}))));
-    // for(int a=-10; a<10; a++)
-    // {
-    //     for(int  b=-10; b<10; b++)
-    //     {
-    //         float choose_mat = random_float();
-    //         vec3 center{a+0.9f*random_float(), 0.2, b+0.9f*random_float()};
-    //         if ((center - vec3{4,0.2,0}).length() > 0.9)
-    //         {
-    //             if( choose_mat <0.8)
-    //                 spherelist.emplace_back(std::make_shared<moving_sphere>( center, center+ vec3{0, 0.5f* random_float(), 0},
-    //                                                                          0.0, 1.0, 0.2,
-    //                                                                          std::make_shared<lambertian>(
-    //                                                                              std::make_unique<const_texture>(
-    //                                                                                  vec3{random_float()*random_float(),
-    //                                                                                       random_float()*random_float(),
-    //                                                                                       random_float()*random_float()}))));
-    //             else if(choose_mat < 0.95)
-    //             {
-    //                 spherelist.emplace_back(std::make_shared<sphere>(center, 0.2,
-    //                                                                  std::make_shared<metal>(vec3{0.5f*(1+random_float()),
-    //                                                                                               0.5f*(1+random_float()),
-    //                                                                                               0.5f*(1+random_float())},
-    //                                                                      0.5*random_float())));
-    //             }
-    //             else {
-    //                 spherelist.emplace_back(std::make_shared<sphere>( center, 0.2, std::make_shared<dielectric>(1.5)));
+    for(int a=-10; a<10; a++)
+    {
+        for(int  b=-10; b<10; b++)
+        {
+            float choose_mat = random_float();
+            vec3 center{a+0.9f*random_float(), 0.2, b+0.9f*random_float()};
+            if ((center - vec3{4,0.2,0}).length() > 0.9)
+            {
+                if( choose_mat <0.8)
+                    spherelist.emplace_back(std::make_shared<moving_sphere>( center, center+ vec3{0, 0.5f* random_float(), 0},
+                                                                             0.0, 1.0, 0.2,
+                                                                             std::make_shared<lambertian>(
+                                                                                 std::make_unique<const_texture>(
+                                                                                     vec3{random_float()*random_float(),
+                                                                                          random_float()*random_float(),
+                                                                                          random_float()*random_float()}))));
+                else if(choose_mat < 0.95)
+                {
+                    spherelist.emplace_back(std::make_shared<sphere>(center, 0.2,
+                                                                     std::make_shared<metal>(vec3{0.5f*(1+random_float()),
+                                                                                                  0.5f*(1+random_float()),
+                                                                                                  0.5f*(1+random_float())},
+                                                                         0.5*random_float())));
+                }
+                else {
+                    spherelist.emplace_back(std::make_shared<sphere>( center, 0.2, std::make_shared<dielectric>(1.5)));
 
-    //             }
-    //         }
-    //     }
-    // }
+                }
+            }
+        }
+    }
 
     spherelist.emplace_back(std::make_shared<sphere>( vec3{0,1,0}, 1, std::make_shared<dielectric>(1.5)));
     spherelist.emplace_back(std::make_shared<sphere>( vec3{-4,1,0}, 1, std::make_shared<dielectric>(1.5)));
@@ -160,16 +160,11 @@ int main()
 {
 
 
-    constexpr auto nx = 200;
-    constexpr  auto ny = 160;
+    constexpr auto nx = 800;
+    constexpr  auto ny = 500;
     constexpr auto ns = 8;
-    size_t num_threads = 2;
+    size_t num_threads = 12;
     size_t rows_thread = ny / num_threads;
-
-    std::ofstream out_file("img.ppm");
-    out_file<< "P3\n"<< nx <<" "<< ny<< "\n255\n";
-
-
 
     constexpr vec3 lookfrom{13,2,3};
     constexpr vec3 lookat{0,0,0};
@@ -180,6 +175,7 @@ int main()
 
     std::vector<uint8_t> image(nx*ny*4);
 
+    #pragma omp parallel for
     for(auto start_row=ny-1; start_row>=0; start_row-=rows_thread)
     {
         process_block(cam, *world, start_row, rows_thread, nx, ny, ns, image);
@@ -189,6 +185,4 @@ int main()
 
     //if there's an error, display it
     if(error) std::cout << "encoder error " << error << ": "<< lodepng_error_text(error) << std::endl;
-
-    out_file.close();
 }
