@@ -1,5 +1,6 @@
 # ray-tracer
 A simple ray tracer implementation WIP
+![image created](/img.png?raw=true "Optional Title")
 
 ## Build
 - clone directory
@@ -20,8 +21,9 @@ A simple ray tracer implementation WIP
   ```
 ## Running
 ### Unit Test
-google test can be run by the executable
+google test can be run by the executable  
 ``` ./runUnitTests```
 ### Ray tracer
-Currently the tracer creates a static image and can be run with no arguments
-```./ray-tracer```
+Currently the tracer creates a static image and can be run with no arguments  
+```./ray-tracer``` 
+
