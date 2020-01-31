@@ -8,7 +8,7 @@ set (CMAKE_CXX_STANDARD 20)
 
 
 include_directories(src)
-add_executable(ray-tracer src/main.cpp src/util.cpp)
+add_executable(ray-tracer src/main.cpp src/util.cpp lodepng/lodepng.cpp)
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
   target_link_libraries(ray-tracer PRIVATE OpenMP::OpenMP_CXX)
