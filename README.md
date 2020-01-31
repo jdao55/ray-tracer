@@ -1,5 +1,5 @@
 # ray-tracer
-A simple ray tracer implementation
+A simple ray tracer implementation WIP
 
 ## Build
 - clone directory
@@ -18,3 +18,10 @@ A simple ray tracer implementation
   cmake -DCMAKE_BUILD_TYPE=release ../
   make -j8
   ```
+## Running
+### Unit Test
+google test can be run by the executable
+``` ./runUnitTests```
+### Ray tracer
+Currently the tracer creates a static image and can be run with no arguments
+```./ray-tracer```
