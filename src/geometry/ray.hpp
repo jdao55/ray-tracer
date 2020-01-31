@@ -17,9 +17,9 @@ class Ray
 
     Ray(){};
     Ray (const vec3 &a, const vec3 &b, const float ti = 0.0):A(a),B(b),time(ti){}
-    inline vec3 origin() const {return A;}
-    inline vec3 direction() const {return B;}
-    inline vec3 point_at_parameter(float t) const {
+    vec3 origin() const {return A;}
+    vec3 direction() const {return B;}
+    vec3 point_at_parameter(const float t) const {
         return A +(t*B);
     }
 

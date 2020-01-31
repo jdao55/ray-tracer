@@ -20,25 +20,29 @@ inline vec3 reflect (const vec3 &v, const vec3 &n)
     return v - n*2*(geometry::dot(n, v));
 }
 
+
 class material{
- public: virtual bool scatter(const geometry::Ray &r_in, const hit_record & rec, vec3 & atteunation, geometry::Ray& scattered) const =0;
+public:
+    virtual bool scatter(const geometry::Ray &r_in, const hit_record & rec, vec3 & atteunation, geometry::Ray& scattered) const =0;
 };
 
+
 class lambertian : public material {
- public:
+public:
     lambertian(std::unique_ptr<texture> a): albedo(std::move(a)){};
     virtual bool scatter(const geometry::Ray &r_in, const hit_record & rec, vec3 & atteunation, geometry::Ray& scattered) const {
         const vec3 target = rec.p + rec.normal +  random_in_unit_sphere();
         scattered = geometry::Ray(rec.p, target - rec.p, r_in.time);
         atteunation = albedo->value(0,0,  rec.p);
-    return true;
-  }
+        return true;
+    }
 
     std::unique_ptr<texture> albedo;
 };
 
+
 class metal : public material {
-  public:
+public:
     metal(const vec3 a, float f): albedo(a){ if (f < 1) fuzz = f; else fuzz = 1; };
     virtual bool scatter(const geometry::Ray &r_in, const hit_record & rec, vec3 & atteunation, geometry::Ray& scattered) const {
         const vec3 reflected = reflect(r_in.direction().unit_vector(), rec.normal);
@@ -50,6 +54,7 @@ class metal : public material {
     vec3 albedo;
     float fuzz;
 };
+
 
 
 bool refract(const vec3& v, const vec3& n, float ni_over_nt, vec3& refracted)

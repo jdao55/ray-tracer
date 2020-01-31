@@ -41,7 +41,7 @@ public:
         horizontal = 2*half_width*focus_dist*u;
         vertical = 2*half_height*focus_dist*v;
     }
-    geometry::Ray get_ray(float s, float t) const
+    geometry::Ray get_ray(const float s, const float t) const
     {
         vec3 rd = lens_radius*random_in_unit_disk();
         vec3 offset = u * rd[0] + v * rd[1];

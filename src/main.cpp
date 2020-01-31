@@ -122,35 +122,28 @@ void process_block(const camera &cam,
                    std::vector<uint8_t> & image)
 {
     std::vector<uint8_t> block_pixels;
+    block_pixels.reserve(nx*4*num_rows);
     for (int j = start_row ; j>=start_row - num_rows && j >= 0 ; j--)
     {
 
-        for (auto i = 0 ; i < nx ; i++)
+        for (auto i = 0 ; size_t(i) < nx ; i++)
         {
 
             vec3 col{0,0,0};
-            for(auto s=0; s<samples;s++)
+            for(auto s=0; size_t(s) <samples;s++)
             {
                 const float u = float(i+random_float())/float(nx);
                 const float v = float(j+random_float())/float(ny);
                 const geometry::Ray r=cam.get_ray(u,v);
 
-                const auto c = colour(r, world, 0);
-                {
-                    col += c;
-                }
+                col += colour(r, world, 0);
+
             }
-            uint8_t red,g,b;
             col /= float(samples);
-            red=tocolor(col[0]);
-            g=tocolor(col[1]);
-            b=tocolor(col[2]);
-            block_pixels.push_back(red);
-            block_pixels.push_back(g);
-            block_pixels.push_back(b);
-            block_pixels.push_back(255);//alpha channel
-
-
+            block_pixels.push_back(tocolor(col[0])); //red
+            block_pixels.push_back(tocolor(col[1]));//green
+            block_pixels.push_back(tocolor(col[2]));//blue
+            block_pixels.push_back(255);//alpha
         }
     }
     std::copy(block_pixels.begin(), block_pixels.end(), image.begin()+(ny-1-start_row)*nx*4);
@@ -175,14 +168,15 @@ int main()
 
     std::vector<uint8_t> image(nx*ny*4);
 
-    #pragma omp parallel for
+#pragma omp parallel for
     for(auto start_row=ny-1; start_row>=0; start_row-=rows_thread)
     {
         process_block(cam, *world, start_row, rows_thread, nx, ny, ns, image);
     }
 
-     unsigned error = lodepng::encode("img.png", image, nx, ny);
+    unsigned error = lodepng::encode("img.png", image, nx, ny);
 
     //if there's an error, display it
-    if(error) std::cout << "encoder error " << error << ": "<< lodepng_error_text(error) << std::endl;
+    if(error)
+        std::cout << "encoder error " << error << ": "<< lodepng_error_text(error) << std::endl;
 }
