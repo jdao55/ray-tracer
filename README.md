@@ -1,7 +1,8 @@
 # ray-tracer
-A simple ray tracer implementation WIP
+A simple ray tracer implementation (WIP)
 ![image created](/img.png?raw=true "Optional Title")
-
+## Dependencies
+- c++11 or higher compiler
 ## Build
 - clone directory
   ```
@@ -26,4 +27,3 @@ google test can be run by the executable
 ### Ray tracer
 Currently the tracer creates a static image and can be run with no arguments  
 ```./ray-tracer``` 
-
