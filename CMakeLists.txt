@@ -8,6 +8,7 @@ set (CMAKE_CXX_STANDARD 20)
 
 
 include_directories(src)
+include_directories("cpp-taskflow/taskflow")
 add_executable(ray-tracer src/main.cpp src/util.cpp lodepng/lodepng.cpp)
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)

@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <utility>
 #include <random>
+#include <taskflow.hpp>
 #include "geometry/vec.hpp"
 #include "geometry/ray.hpp"
 #include "geometry/camera.hpp"
@@ -42,7 +43,7 @@ std::unique_ptr<hitable_list> two_perlin()
 }
 
 
-vec3 colour(const geometry::Ray &r, hitable & world, int depth, const vec3 = vec3{0,0,0})
+vec3 colour(const geometry::Ray &r, const hitable & world, int depth, const vec3 = vec3{0,0,0})
 {
     hit_record rec;
     if( world.hit(r, 0.001, MAXFLOAT, rec) )
@@ -113,70 +114,92 @@ std::unique_ptr<bvhNode> random_scene()
     return  bvh_list;
 }
 
-void process_block(const camera &cam,
-                   hitable & world,
-                   const int start_row,
-                   const int num_rows,
-                   const size_t nx, const size_t ny,
-                   const size_t samples,
-                   std::vector<uint8_t> & image)
+void process_line(const camera &cam,
+                  const hitable & world,
+                  const int start_row,
+                  const size_t nx, const size_t ny,
+                  const size_t samples,
+                  std::vector<uint8_t> & image)
 {
     std::vector<uint8_t> block_pixels;
-    block_pixels.reserve(nx*4*num_rows);
-    for (int j = start_row ; j>=start_row - num_rows && j >= 0 ; j--)
+    block_pixels.reserve(nx*4);
+    for (auto i = 0 ; size_t(i) < nx ; i++)
     {
 
-        for (auto i = 0 ; size_t(i) < nx ; i++)
+        vec3 col{0,0,0};
+        for(auto s=0; size_t(s) <samples;s++)
         {
+            const float u = float(i+random_float())/float(nx);
+            const float v = float(start_row+random_float())/float(ny);
+            const geometry::Ray r=cam.get_ray(u,v);
 
-            vec3 col{0,0,0};
-            for(auto s=0; size_t(s) <samples;s++)
-            {
-                const float u = float(i+random_float())/float(nx);
-                const float v = float(j+random_float())/float(ny);
-                const geometry::Ray r=cam.get_ray(u,v);
+            col += colour(r, world, 0);
 
-                col += colour(r, world, 0);
-
-            }
-            col /= float(samples);
-            block_pixels.push_back(tocolor(col[0])); //red
-            block_pixels.push_back(tocolor(col[1]));//green
-            block_pixels.push_back(tocolor(col[2]));//blue
-            block_pixels.push_back(255);//alpha
         }
+        col /= float(samples);
+        block_pixels.push_back(tocolor(col[0])); //red
+        block_pixels.push_back(tocolor(col[1]));//green
+        block_pixels.push_back(tocolor(col[2]));//blue
+        block_pixels.push_back(255);//alpha
     }
     std::copy(block_pixels.begin(), block_pixels.end(), image.begin()+(ny-1-start_row)*nx*4);
 }
+struct task{
+    camera &cam;
+    hitable & world;
+    int row;
+    size_t nx;
+    size_t ny;
+    size_t samples;
+    std::vector<uint8_t> & image;
 
+    task(
+        camera &cam_,
+        hitable & world_,
+        int row_,
+        size_t nx_,
+        size_t ny_,
+        size_t samples_,
+        std::vector<uint8_t> & image_):
+        cam(cam_), world(world_), row(row_), nx(nx_), ny(ny_), samples(samples_), image(image_){}
+    void operator()() {
+        process_line(cam,
+                      world,
+                      row,
+                      nx,ny,samples,image);
+    }
+};
 int main()
 {
-
-
+    tf::Executor executor;
+    tf::Taskflow taskflow;
     constexpr auto nx = 800;
     constexpr  auto ny = 500;
     constexpr auto ns = 8;
-    size_t num_threads = 12;
-    size_t rows_thread = ny / num_threads;
 
     constexpr vec3 lookfrom{13,2,3};
     constexpr vec3 lookat{0,0,0};
     constexpr float distance_focus = 10.0;
-    const camera cam(lookfrom, lookat, vec3{0,1,0}, 20, float(nx)/float(ny), 0.00, distance_focus, 0.0, 1.0);
+    camera cam(lookfrom, lookat, vec3{0,1,0}, 20, float(nx)/float(ny), 0.00, distance_focus, 0.0, 1.0);
 
     std::unique_ptr<hitable> world = random_scene();
 
     std::vector<uint8_t> image(nx*ny*4);
 
-#pragma omp parallel for
-    for(auto start_row=ny-1; start_row>=0; start_row-=rows_thread)
+    std::vector<task> job_list;
+    job_list.reserve(ny);
+    for(auto row=ny-1; row>=0; row-=1)
     {
-        process_block(cam, *world, start_row, rows_thread, nx, ny, ns, image);
+        job_list.push_back(task(cam, *world, row, nx, ny, ns, image));
     }
-
+    taskflow.parallel_for(job_list.begin(), job_list.end(),
+                          [](auto job){job();});
+    executor.run(taskflow).wait();
     unsigned error = lodepng::encode("img.png", image, nx, ny);
 
     //if there's an error, display it
     if(error)
         std::cout << "encoder error " << error << ": "<< lodepng_error_text(error) << std::endl;
+
+    return 0;
 }
