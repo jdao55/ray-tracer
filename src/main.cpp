@@ -75,9 +75,9 @@ std::unique_ptr<bvhNode> random_scene()
     spherelist.emplace_back(std::make_shared<sphere>( vec3{0, -1000, 0}, 1000,
                                                       std::make_shared<lambertian>(
                                                           std::make_unique<checker_texture>(vec3{0.9, 0.9, 0.9},vec3{0.1 ,0.1, 0.1}))));
-    for(int a=-10; a<10; a++)
+    for(int a=-8; a<8; a++)
     {
-        for(int  b=-10; b<10; b++)
+        for(int  b=-5; b<5; b++)
         {
             float choose_mat = random_float();
             vec3 center{a+0.9f*random_float(), 0.2, b+0.9f*random_float()};
@@ -173,9 +173,9 @@ int main()
 {
     tf::Executor executor;
     tf::Taskflow taskflow;
-    constexpr auto nx = 800;
-    constexpr  auto ny = 500;
-    constexpr auto ns = 8;
+    constexpr auto nx = 1000;
+    constexpr  auto ny = 800;
+    constexpr auto ns = 64;
 
     constexpr vec3 lookfrom{13,2,3};
     constexpr vec3 lookat{0,0,0};

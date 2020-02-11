@@ -2,10 +2,12 @@ cmake_minimum_required(VERSION 3.9)
 project(ray-tracer)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -Ofast")
 set (CMAKE_CXX_STANDARD 20)
 
-
+if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
+  message("debug mode")
+endif ()
 
 include_directories(src)
 include_directories("cpp-taskflow/taskflow")
