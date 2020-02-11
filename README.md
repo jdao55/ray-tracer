@@ -1,8 +1,10 @@
 # ray-tracer
 A simple ray tracer implementation (WIP)
 ![image created](/img.png?raw=true "Optional Title")
-## Dependencies
+## Dependencies and 3rd party libaries 
 - c++11 or higher compiler
+- google test
+- cpp-taskflow
 ## Build
 - clone directory
   ```
