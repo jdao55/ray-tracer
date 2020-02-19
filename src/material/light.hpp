@@ -2,6 +2,7 @@
 #define LIGHT_H
 #include "material.hpp"
 #include "../geometry/ray.hpp"
+#include "texture/texture.hpp"
 
 class diffuse_light : public material {
 public:
