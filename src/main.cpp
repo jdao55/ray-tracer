@@ -43,7 +43,7 @@ std::unique_ptr<hitable_list> two_perlin()
     return world_list;
 }
 
-
+//TODO get rid of recursive call
 vec3 colour(const geometry::Ray &r, const hitable & world, int depth, const vec3 = vec3{0,0,0})
 {
     hit_record rec;
@@ -54,19 +54,18 @@ vec3 colour(const geometry::Ray &r, const hitable & world, int depth, const vec3
         vec3 emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
         if (depth < 50 && rec.mat_ptr->scatter(r, rec, atteunation, scattered))
         {
-            return atteunation*colour(scattered, world, depth+1 );
+            //TODO refactor recursive call
+            return emitted + atteunation*colour(scattered, world, depth+1 );
         }
         else
         {
-            return vec3{0,0,0};
+            return emitted;
         }
 
     }
     else
     {
-        const vec3 unit_dir = (r.direction()).unit_vector();
-        const float t = 0.5 * (unit_dir[1] + 1.0);
-        return (1.0-t)*vec3{1.0, 1.0, 1.0} + t *vec3{0.5, 0.7, 1.0};
+        return vec3{0,0,0};
     }
 }
 
