@@ -16,6 +16,7 @@
 #include "util.hpp"
 #include "hitable/bvh.hpp"
 #include "material/material.hpp"
+#include "material/light.hpp"
 #include "../lodepng/lodepng.h"
 
 using vec3 = geometry::vec<float,3>;
@@ -50,6 +51,7 @@ vec3 colour(const geometry::Ray &r, const hitable & world, int depth, const vec3
     {
         geometry::Ray scattered;
         vec3 atteunation;
+        vec3 emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
         if (depth < 50 && rec.mat_ptr->scatter(r, rec, atteunation, scattered))
         {
             return atteunation*colour(scattered, world, depth+1 );
@@ -75,6 +77,7 @@ std::unique_ptr<bvhNode> random_scene()
     spherelist.emplace_back(std::make_shared<sphere>( vec3{0, -1000, 0}, 1000,
                                                       std::make_shared<lambertian>(
                                                           std::make_unique<checker_texture>(vec3{0.9, 0.9, 0.9},vec3{0.1 ,0.1, 0.1}))));
+
     for(int a=-8; a<8; a++)
     {
         for(int  b=-5; b<5; b++)
@@ -109,8 +112,11 @@ std::unique_ptr<bvhNode> random_scene()
 
     spherelist.emplace_back(std::make_shared<sphere>( vec3{0,1,0}, 1, std::make_shared<dielectric>(1.5)));
     spherelist.emplace_back(std::make_shared<sphere>( vec3{-4,1,0}, 1, std::make_shared<dielectric>(1.5)));
-    spherelist.emplace_back(std::make_shared<sphere>( vec3{4,1,0}, 1, std::make_shared<metal>(vec3{0.7,0.6,0.5},0.0)));
-    auto bvh_list =std::make_unique<bvhNode>(spherelist.begin(), spherelist.end(),0.0, 1.0);
+    // spherelist.emplace_back(std::make_shared<sphere>( vec3{4,1,0}, 1, std::make_shared<metal>(vec3{0.7,0.6,0.5},0.0)));
+    spherelist.emplace_back(std::make_shared<sphere>( vec3{4, 1, 0}, 1,
+                                                      std::make_shared<diffuse_light>(
+                                                          std::make_unique<const_texture>(vec3{0.9, 0.9, 0.9}))));
+    auto bvh_list =std::make_unique<bvhNode>(spherelist.begin(), spherelist.end(), 0.0, 1.0);
     return  bvh_list;
 }
 
@@ -173,9 +179,9 @@ int main()
 {
     tf::Executor executor;
     tf::Taskflow taskflow;
-    constexpr auto nx = 1000;
-    constexpr  auto ny = 800;
-    constexpr auto ns = 64;
+    constexpr auto nx = 400;
+    constexpr  auto ny = 300;
+    constexpr auto ns = 16;
 
     constexpr vec3 lookfrom{13,2,3};
     constexpr vec3 lookat{0,0,0};

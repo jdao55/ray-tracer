@@ -18,6 +18,8 @@ class triangle: public hitable
     bool hit (const geometry::Ray &r,const  float t_min,const float t_max, hit_record &rec) const
     {
         //TODO implement hit calculation
+        //find plane+ray intersection
+        //find if intersection point lies in triangle
         return false;
     }
     bool bounding_box([[maybe_unused]] float t0, [[maybe_unused]] float t1, aabb& box) const

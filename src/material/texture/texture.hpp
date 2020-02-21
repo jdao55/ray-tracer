@@ -64,4 +64,34 @@ class noise_texture : public texture
     float scale;
 };
 
+void get_sphere_uv(const vec3& p, float& u, float& v) {
+    float phi = atan2(p[2], p[0]);
+    float theta = asin(p[1]);
+    u = 1-(phi + M_PI) / (2*M_PI);
+    v = (theta + M_PI/2) / M_PI;
+}
+
+class image_texture : public texture {
+public:
+    image_texture() {}
+    image_texture(std::vector<uint8_t> &pixels, int A, int B)
+        : data(pixels), nx(A), ny(B) {}
+    virtual vec3 value(float u, float v, const vec3& p) const;
+    std::vector<uint8_t> data;
+    int nx, ny;
+};
+
+vec3 image_texture::value(float u, float v, const vec3& p) const {
+    int i = (  u) * nx;
+    int j = (1-v) * ny - 0.001;
+    if (i < 0) i = 0;
+    if (j < 0) j = 0;
+    if (i > nx-1) i = nx-1;
+    if (j > ny-1) j = ny-1;
+    float r = int(data[3*i + 3*nx*j]  ) / 255.0;
+    float g = int(data[3*i + 3*nx*j+1]) / 255.0;
+    float b = int(data[3*i + 3*nx*j+2]) / 255.0;
+    return vec3{r, g, b};
+}
+
 #endif
