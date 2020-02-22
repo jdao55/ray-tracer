@@ -6,21 +6,15 @@ A simple ray tracer implementation (WIP)
 - google test
 - cpp-taskflow
 ## Build
-- clone directory
+- clone directory and submodules
   ```
-  git clone https://github.com/jdao55/ray-tracer.git
-  ```
-- update submodules
-  ```
-  cd ray-tracer
-  git submodule update --init --recursive
-  git submodule update --recursive --remote
+  git clone --recurse-submodules https://github.com/jdao55/ray-tracer.git
   ```
 - build project
   ```
   mkdir build && cd build
-  cmake -DCMAKE_BUILD_TYPE=release ../
-  make -j8
+  cmake -DCMAKE_BUILD_TYPE=Release ../
+  make
   ```
 ## Running
 ### Unit Test
