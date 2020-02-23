@@ -1,5 +1,6 @@
 #include <iostream>
 #include "../geometry/vec.hpp"
+#include "../geometry/geometry_util.hpp"
 #include "gtest/gtest.h"
 
 
@@ -59,6 +60,13 @@ TEST(vec_test, operation_dot)
     geometry::vec<int, 5> a5{6, 1, -2 , 4 , 21};
     geometry::vec<int, 5> b5{5, -2, 0, 22, -123};
     EXPECT_EQ(geometry::dot(a5,b5), -2467);
+}
 
-
+TEST(geometry_test, area)
+{
+    using namespace geometry;
+    vec<float, 3> a{0.0, 0.0, 0.0};
+    vec<float, 3> b{1.0, 0.0, 0.0};
+    vec<float, 3> c{0.0, 1.0, 0.0};
+    EXPECT_EQ(triangle_area(a, b, c), 0.5);
 }

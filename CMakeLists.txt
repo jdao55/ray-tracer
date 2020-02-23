@@ -11,7 +11,11 @@ endif ()
 
 include_directories(src)
 include_directories("cpp-taskflow/taskflow")
-add_executable(ray-tracer src/main.cpp src/util.cpp lodepng/lodepng.cpp)
+
+file(GLOB RT_SOURCE
+  src/util.cpp src/geometry/geometry_util.cpp lodepng/lodepng.cpp
+  )
+add_executable(ray-tracer  src/main.cpp ${RT_SOURCE})
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
   target_link_libraries(ray-tracer PRIVATE OpenMP::OpenMP_CXX)
@@ -25,7 +29,7 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 
 file(GLOB TEST_SRC_FILES ${PROJECT_SOURCE_DIR}/src/test/*.cpp)
-add_executable(runUnitTests ${TEST_SRC_FILES})
+add_executable(runUnitTests ${TEST_SRC_FILES} ${RT_SOURCE})
 
 
 target_link_libraries(runUnitTests gtest gtest_main)

@@ -229,8 +229,8 @@ namespace geometry
         return sqrt(res);
     }
 
-     template<typename T, size_t n>
-     T length(const vec<T,n> &v1, const vec<T,n> &v2)
+    template<typename T, size_t n>
+    T length(const vec<T,n> &v1, const vec<T,n> &v2)
     {
         return length(v1 - v2);
     }
