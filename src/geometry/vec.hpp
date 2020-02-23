@@ -5,6 +5,7 @@
 #include <array>
 #include <cstddef>
 #include <iostream>
+#include <math.h>
 namespace geometry
 {
 
@@ -215,6 +216,23 @@ namespace geometry
         return vec<T,3> { (v1[1] * v2.e[2] - v1.e[2] * v2.e[1]),
                 (-(v1.e[0] * v2.e[2] - v1.e[2] * v2.e[0])),
                 v1.e[0] * v2.e[1] - v1.e[1] * v2.e[0] };
+    }
+
+    template<typename T, size_t n>
+    T length(const vec<T,n> &v)
+    {
+        T res = 0;
+        for(size_t i=1; i<n; i++)
+        {
+            res += v[i]*v[i];
+        }
+        return sqrt(res);
+    }
+
+     template<typename T, size_t n>
+     T length(const vec<T,n> &v1, const vec<T,n> &v2)
+    {
+        return length(v1 - v2);
     }
 }
 
