@@ -4,7 +4,7 @@ A simple ray tracer implementation (WIP)
 ## Dependencies and 3rd party libaries 
 - c++11 or higher compiler
 - google test
-- cpp-taskflow
+- [cpp-taskflow](https://github.com/cpp-taskflow/cpp-taskflow)
 ## Build
 - clone directory and submodules
   ```
