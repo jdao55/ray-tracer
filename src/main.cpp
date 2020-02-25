@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <utility>
 #include <random>
-#include <taskflow.hpp>
+#include <taskflow/taskflow.hpp>
 #include "geometry/vec.hpp"
 #include "geometry/ray.hpp"
 #include "geometry/camera.hpp"

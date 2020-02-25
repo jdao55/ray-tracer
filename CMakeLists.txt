@@ -1,37 +1,84 @@
-cmake_minimum_required(VERSION 3.9)
-project(ray-tracer)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -Ofast")
-set (CMAKE_CXX_STANDARD 20)
+cmake_minimum_required(VERSION 3.15)
 
-if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
-  message("debug mode")
-endif ()
+# Set the project name to your project name, my project isn't very descriptive
+project(ray-tracer CXX)
+include(cmake/StandardProjectSettings.cmake)
 
-include_directories(src)
-include_directories("cpp-taskflow/taskflow")
+# Link this 'library' to set the c++ standard / compile-time options requested
+add_library(project_options INTERFACE)
+target_compile_features(project_options INTERFACE cxx_std_17)
 
-file(GLOB RT_SOURCE
-  src/util.cpp src/geometry/geometry_util.cpp lodepng/lodepng.cpp
-  )
-add_executable(ray-tracer  src/main.cpp ${RT_SOURCE})
-find_package(OpenMP)
-if(OpenMP_CXX_FOUND)
-  target_link_libraries(ray-tracer PRIVATE OpenMP::OpenMP_CXX)
+# Link this 'library' to use the warnings specified in CompilerWarnings.cmake
+add_library(project_warnings INTERFACE)
+
+# standard compiler warnings
+include(cmake/CompilerWarnings.cmake)
+set_project_warnings(project_warnings)
+
+# sanitizer options if supported by compiler
+include(cmake/Sanitizers.cmake)
+enable_sanitizers(project_options)
+
+# enable doxygen
+include(cmake/Doxygen.cmake)
+enable_doxygen()
+
+# allow for static analysis options
+include(cmake/StaticAnalyzers.cmake)
+
+option(BUILD_SHARED_LIBS "Enable compilation of shared libraries" OFF)
+option(ENABLE_TESTING "Enable Test Builds" OFF)
+
+# Very basic PCH example
+option(ENABLE_PCH "Enable Precompiled Headers" OFF)
+if (ENABLE_PCH)
+  # This sets a global PCH parameter, each project will build its own PCH, which
+  # is a good idea if any #define's change
+  #
+  #
+  target_precompile_headers(project_options INTERFACE <vector> <string> <map> <utility>)
 endif()
 
 
-add_subdirectory(./googletest)
-enable_testing()
+# Set up some extra Conan dependencies based on our needs
+# before loading Conan
+set(CONAN_EXTRA_REQUIRES "")
+set(CONAN_EXTRA_OPTIONS "")
 
-include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+set(CONAN_EXTRA_REQUIRES  ${CONAN_EXTRA_REQUIRES}  cpp-taskflow/2.2.0)
+if(CPP_STARTER_USE_IMGUI)
+  set(CONAN_EXTRA_REQUIRES ${CONAN_EXTRA_REQUIRES}
+                           imgui-sfml/2.1@bincrafters/stable)
+
+  # set(CONAN_EXTRA_OPTIONS ${CONAN_EXTRA_OPTIONS} sfml:shared=False
+  # sfml:graphics=True sfml:audio=False sfml:window=True
+  # libalsa:disable_python=True)
+endif()
+
+if(CPP_STARTER_USE_SDL)
+  set(CONAN_EXTRA_REQUIRES ${CONAN_EXTRA_REQUIRES}
+                           sdl2/2.0.10@bincrafters/stable)
+  # set(CONAN_EXTRA_OPTIONS ${CONAN_EXTRA_OPTIONS} sdl2:wayland=True)
+endif()
 
 
-file(GLOB TEST_SRC_FILES ${PROJECT_SOURCE_DIR}/src/test/*.cpp)
-add_executable(runUnitTests ${TEST_SRC_FILES} ${RT_SOURCE})
+include(cmake/Conan.cmake)
+run_conan()
+
+if(ENABLE_TESTING)
+  enable_testing()
+  message(
+    "Building Tests. Be sure to check out test/constexpr_tests for constexpr testing"
+  )
+  add_subdirectory(test)
+endif()
+
+if(ENABLE_FUZZING)
+  message(
+    "Building Fuzz Tests, using fuzzing sanitizer https://www.llvm.org/docs/LibFuzzer.html"
+  )
+  add_subdirectory(fuzz_test)
+endif()
 
 
-target_link_libraries(runUnitTests gtest gtest_main)
-
-add_test(UnitTests runUnitTests)
+add_subdirectory(src)
