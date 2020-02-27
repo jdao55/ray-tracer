@@ -4,6 +4,7 @@ A simple ray tracer implementation (WIP)
 ## Dependencies and 3rd party libaries 
 - c++11 or higher compiler
 - google test
+- [conan](https://conan.io/)
 - [cpp-taskflow](https://github.com/cpp-taskflow/cpp-taskflow)
 ## Build
 - clone directory and submodules
