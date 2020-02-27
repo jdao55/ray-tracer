@@ -65,6 +65,7 @@ endif()
 include(cmake/Conan.cmake)
 run_conan()
 
+# TODO update CMAKE for tests
 if(ENABLE_TESTING)
   enable_testing()
   message(
