@@ -27,7 +27,7 @@ enable_doxygen()
 include(cmake/StaticAnalyzers.cmake)
 
 option(BUILD_SHARED_LIBS "Enable compilation of shared libraries" OFF)
-option(ENABLE_TESTING "Enable Test Builds" OFF)
+option(ENABLE_TESTING "Enable Test Builds" ON)
 
 # Very basic PCH example
 option(ENABLE_PCH "Enable Precompiled Headers" OFF)
@@ -67,11 +67,12 @@ run_conan()
 
 # TODO update CMAKE for tests
 if(ENABLE_TESTING)
+  add_subdirectory(googletest)
   enable_testing()
   message(
     "Building Tests. Be sure to check out test/constexpr_tests for constexpr testing"
   )
-  add_subdirectory(test)
+  add_subdirectory(src/test)
 endif()
 
 if(ENABLE_FUZZING)
