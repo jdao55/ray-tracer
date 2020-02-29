@@ -8,6 +8,7 @@ A simple ray tracer implementation (WIP)
 - [conan](https://conan.io/)
 - [cpp-taskflow](https://github.com/cpp-taskflow/cpp-taskflow)
 ## Build
+- make sure conan and cmake is installed
 - clone directory and submodules
   ```
   git clone --recurse-submodules https://github.com/jdao55/ray-tracer.git
