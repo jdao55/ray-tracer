@@ -5,8 +5,8 @@
 #include "../geometry/ray.hpp"
 
 using vec3 = geometry::vec<float,3>;
-inline float ffmax(float a, float b){return a>b?a:b;}
-inline float ffmin(float a, float b){return a<b?a:b;}
+inline float ffmax(const float a, const float b){return a>b?a:b;}
+inline float ffmin(const float a, const float b){return a<b?a:b;}
 struct aabb
 {
     vec3 _min, _max;
@@ -15,7 +15,7 @@ struct aabb
     aabb(const vec3 a, const vec3 b): _min(a), _max(b){}
 
     bool hit(const geometry::Ray &r, float tmin, float tmax) const {
-        for (auto a =0; a<3; a++)
+        for (size_t a =0; a<3; a++)
         {
             const float t0 = ffmin((_min[a] - r.origin()[a])/ r.direction()[a],
                               (_max[a] - r.origin()[a])/ r.direction()[a] );

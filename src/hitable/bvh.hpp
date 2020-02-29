@@ -15,31 +15,31 @@ inline auto box_x_compare (const hitable_ptr &a, const hitable_ptr & b)
 {
     aabb box_left, box_right;
 
-    if(!a->bounding_box(0,0, box_left) || !b->bounding_box(0,0, box_right))
+    if(!a->bounding_box(0.0f, 0.0f, box_left) || !b->bounding_box(0.0f, 0.0f, box_right))
         std::cerr << "no bounding box in bvh_node constructor\n";
 
-    return  ( box_right._min[0] - box_left._min[0] < 0.0  );
-};
+    return  ( box_right._min[0] - box_left._min[0] < 0.0f  );
+}
 
 inline auto box_y_compare (const hitable_ptr &a, const hitable_ptr & b)
 {
     aabb box_left, box_right;
 
-    if(!a->bounding_box(0,0, box_left) || !b->bounding_box(0,0, box_right))
+    if(!a->bounding_box(0.0f,0.0f, box_left) || !b->bounding_box(0.0f,0.0f, box_right))
         std::cerr << "no bounding box in bvh_node constructor\n";
 
-    return  ( box_right._min[1] - box_left._min[1] < 0.0  );
-};
+    return  ( box_right._min[1] - box_left._min[1] < 0.0f  );
+}
 
 inline auto box_z_compare (const hitable_ptr &a, const hitable_ptr & b)
 {
     aabb box_left, box_right;
 
-    if(!a->bounding_box(0,0, box_left) || !b->bounding_box(0,0, box_right))
+    if(!a->bounding_box(0.0f,0.0f, box_left) || !b->bounding_box(0.0f,0.0f, box_right))
         std::cerr << "no bounding box in bvh_node constructor\n";
 
-    return  ( box_right._min[2] - box_left._min[2] < 0.0  );
-};
+    return  ( box_right._min[2] - box_left._min[2] < 0.0f  );
+}
 
 class bvhNode : public hitable
 {
@@ -52,8 +52,8 @@ class bvhNode : public hitable
     using hitable_iter = std::vector<hitable_ptr>::iterator;
     bvhNode (hitable_iter list_begin,  hitable_iter list_end, float time0, float time1)
     {
-        const int n = std::distance(list_begin, list_end);
-        const int axis = int(3*random_float());
+        const auto n = std::distance(list_begin, list_end);
+        const size_t axis = static_cast<size_t>(3.0f*random_float());
         if (axis == 0)
             std::sort(list_begin, list_end, box_x_compare);
         else if (axis == 1){
