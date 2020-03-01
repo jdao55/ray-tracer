@@ -65,7 +65,6 @@ endif()
 include(cmake/Conan.cmake)
 run_conan()
 
-# TODO update CMAKE for tests
 if(ENABLE_TESTING)
   add_subdirectory(googletest)
   enable_testing()
