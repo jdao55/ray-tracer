@@ -70,3 +70,14 @@ TEST(geometry_test, area)
     vec<float, 3> c{0.0, 1.0, 0.0};
     EXPECT_EQ(triangle_area(a, b, c), 0.5);
 }
+
+TEST(gemetry_test, point_in_tri)
+{
+    using namespace geometry;
+    vec<float, 3> a{0.0, 0.0, 0.0};
+    vec<float, 3> b{1.0, 0.0, 0.0};
+    vec<float, 3> c{0.0, 1.0, 0.0};
+    EXPECT_EQ(point_in_triangle(a, b, c, vec3{0.5, 0.25, 0.0}, 1e-6f), true);
+    EXPECT_EQ(point_in_triangle(a, b, c, vec3{2, 1, 0.0}, 1e-6f), false);
+
+}
