@@ -35,18 +35,18 @@ std::unique_ptr<hitable_list> two_perlin()
 {
     auto world_list = std::make_unique<hitable_list>();
     world_list->list.emplace_back(std::make_shared<sphere>(
-        vec3{0,-1000,0},
-        1000,
+        vec3{0.0f,-1000.0f,0.0f},
+        1000.0f,
         std::make_shared<lambertian>(std::make_unique<noise_texture>(4))));
     world_list->list.emplace_back(std::make_shared<sphere>(
-        vec3{0, 2, 0},
+        vec3{0.0f, 2.0f, 0.0f},
         2,
         std::make_shared<lambertian>(std::make_unique<noise_texture>(4))));
     return world_list;
 }
 
 //TODO get rid of recursive call
-vec3 colour(const geometry::Ray &r, const hitable & world, int depth, const vec3 = vec3{0,0,0})
+vec3 colour(const geometry::Ray &r, const hitable & world, int depth, const vec3 = vec3{0.0f,0.0f,0.0f})
 {
     hit_record rec;
     if(world.hit(r, 0.001f, MAXFLOAT, rec) )
@@ -74,21 +74,21 @@ vec3 colour(const geometry::Ray &r, const hitable & world, int depth, const vec3
 std::unique_ptr<bvhNode> random_scene()
 {
     std::vector<hitable_ptr> spherelist;
-    spherelist.emplace_back(std::make_shared<sphere>( vec3{0, -1000, 0}, 1000,
+    spherelist.emplace_back(std::make_shared<sphere>( vec3{0.0f, -1000.0f, 0.0f}, 1000.0f,
                                                       std::make_shared<lambertian>(
-                                                          std::make_unique<checker_texture>(vec3{0.9, 0.9, 0.9},vec3{0.1 ,0.1, 0.1}))));
+                                                          std::make_unique<checker_texture>(vec3{0.9f, 0.9f, 0.9f},vec3{0.1f ,0.1f, 0.1f}))));
 
     for(int a=-8; a<8; a++)
     {
         for(int  b=-5; b<5; b++)
         {
             float choose_mat = random_float();
-            vec3 center{a+0.9f*random_float(), 0.2, b+0.9f*random_float()};
-            if ((center - vec3{4,0.2,0}).length() > 0.9)
+            vec3 center{a+0.9f*random_float(), 0.2f, b+0.9f*random_float()};
+            if ((center - vec3{4.0f, 0.2f, 0.0f}).length() > 0.9f)
             {
-                if( choose_mat <0.8)
-                    spherelist.emplace_back(std::make_shared<moving_sphere>( center, center+ vec3{0, 0.5f* random_float(), 0},
-                                                                             0.0, 1.0, 0.2,
+                if( choose_mat <0.8f)
+                    spherelist.emplace_back(std::make_shared<moving_sphere>( center, center+ vec3{0.0f, 0.5f* random_float(), 0},
+                                                                             0.0f, 1.0f, 0.2f,
                                                                              std::make_shared<lambertian>(
                                                                                  std::make_unique<const_texture>(
                                                                                      vec3{random_float()*random_float(),
@@ -96,26 +96,26 @@ std::unique_ptr<bvhNode> random_scene()
                                                                                           random_float()*random_float()}))));
                 else if(choose_mat < 0.95)
                 {
-                    spherelist.emplace_back(std::make_shared<sphere>(center, 0.2,
+                    spherelist.emplace_back(std::make_shared<sphere>(center, 0.2f,
                                                                      std::make_shared<metal>(vec3{0.5f*(1+random_float()),
                                                                                                   0.5f*(1+random_float()),
                                                                                                   0.5f*(1+random_float())},
-                                                                         0.5*random_float())));
+                                                                         0.5f*random_float())));
                 }
                 else {
-                    spherelist.emplace_back(std::make_shared<sphere>( center, 0.2, std::make_shared<dielectric>(1.5)));
+                    spherelist.emplace_back(std::make_shared<sphere>( center, 0.2f, std::make_shared<dielectric>(1.5f)));
 
                 }
             }
         }
     }
 
-    spherelist.emplace_back(std::make_shared<sphere>( vec3{0,1,0}, 1, std::make_shared<dielectric>(1.5)));
-    spherelist.emplace_back(std::make_shared<sphere>( vec3{-4,1,0}, 1, std::make_shared<dielectric>(1.5)));
+    spherelist.emplace_back(std::make_shared<sphere>( vec3{0.0f,1.0f,0.0f}, 1.0f, std::make_shared<dielectric>(1.5f)));
+    spherelist.emplace_back(std::make_shared<sphere>( vec3{-4.0f,1.0f,0.0f}, 1.0f, std::make_shared<dielectric>(1.5f)));
     // spherelist.emplace_back(std::make_shared<sphere>( vec3{4,1,0}, 1, std::make_shared<metal>(vec3{0.7,0.6,0.5},0.0)));
     spherelist.emplace_back(std::make_shared<sphere>( vec3{4, 1, 0}, 1,
                                                       std::make_shared<diffuse_light>(
-                                                          std::make_unique<const_texture>(vec3{0.9, 0.9, 0.9}))));
+                                                          std::make_unique<const_texture>(vec3{0.9f, 0.9f, 0.9f}))));
     auto bvh_list =std::make_unique<bvhNode>(spherelist.begin(), spherelist.end(), 0.0, 1.0);
     return  bvh_list;
 }
@@ -123,10 +123,10 @@ std::unique_ptr<bvhNode> random_scene()
 std::unique_ptr<bvhNode> tri_scene()
 {
     std::vector<hitable_ptr> spherelist;
-    spherelist.emplace_back(std::make_shared<triangle>( vec3{0,0, 0},  vec3{1, 0, 0}, vec3{0, 1, 0},
+    spherelist.emplace_back(std::make_shared<triangle>( vec3{0.0f,0.0f, 0.0f},  vec3{1.0f, 0.0f, 0.0f}, vec3{0.0f, 1.0f, 0.0f},
                                                         std::make_shared<diffuse_light>(
-                                                            std::make_unique<const_texture>(vec3{0.9, 0.9, 0.9}))));
-    auto bvh_list = std::make_unique<bvhNode>(spherelist.begin(), spherelist.end(), 0.0, 1.0);
+                                                            std::make_unique<const_texture>(vec3{0.9f, 0.9f, 0.9f}))));
+    auto bvh_list = std::make_unique<bvhNode>(spherelist.begin(), spherelist.end(), 0.0f, 1.0f);
     return  bvh_list;
 
 }
@@ -146,8 +146,8 @@ void process_line(const camera &cam,
         vec3 col{0,0,0};
         for(auto s=0; size_t(s) <samples;s++)
         {
-            const float u = float(i+random_float())/float(nx);
-            const float v = float(start_row+random_float())/float(ny);
+            const float u = (i+random_float())/float(nx);
+            const float v = (start_row+random_float())/float(ny);
             const geometry::Ray r=cam.get_ray(u,v);
 
             col += colour(r, world, 0);
@@ -196,12 +196,12 @@ int main()
 
     // constexpr vec3 lookfrom{13,2,3};
     // constexpr vec3 lookat{0,0,0};
-    constexpr vec3 lookfrom{0, 0,6};
-    constexpr vec3 lookat{0,0,0};
-    constexpr float distance_focus = 10.0;
-    camera cam(lookfrom, lookat, vec3{0,1,0}, 20, float(nx)/float(ny), 0.00, distance_focus, 0.0, 1.0);
+    constexpr vec3 lookfrom{0.0f, 0.0f,6.0f};
+    constexpr vec3 lookat{0.0f,0.0f,0.0f};
+    constexpr float distance_focus = 10.0f;
+    camera cam(lookfrom, lookat, vec3{0.0f,1.0f,0.0f}, 20.0f, float(nx)/float(ny), 0.0f, distance_focus, 0.0f, 1.0f);
 
-    std::unique_ptr<hitable> world =tri_scene();
+    std::unique_ptr<hitable> world = random_scene();
 
     std::vector<uint8_t> image(nx*ny*4);
 
