@@ -14,7 +14,7 @@ bool geometry::point_in_triangle(const vec3 &a, const vec3 &b, const vec3 &c, co
 
     float area_difference = area_abc - area_abp - area_pbc - area_apc;
     float relative_difference = area_difference / area_abc;
-    if (abs(relative_difference) < error)
+    if (fabs(relative_difference) < error)
         return true;
     return false;
 }
@@ -25,14 +25,14 @@ float geometry::triangle_area(const vec3 &a, const vec3 &b, const vec3 &c)
 
     return length(cross(ab, ac)) / 2;
 }
-std::optional<vec3> geometry::ray_plane_intersection(const geometry::Ray &r, vec3 p_point, vec3 p_normal)
+std::optional<float> geometry::ray_plane_intersection(const geometry::Ray &r, vec3 p_point, vec3 p_normal)
 {
     auto denominator = geometry::dot(p_normal, r.B);
-    if (denominator > 1e-6)
+    if (fabs(denominator) > 1e-6f)
     {
         auto p0l0 = p_point - r.A;
-        auto t = geometry::dot(p0l0, p_normal);
-        return r.point_at_parameter(t);
+        auto t = geometry::dot(p0l0, p_normal)/denominator;
+        return t;
     }
     return {};
 }

@@ -12,6 +12,8 @@
 #include "hitable/sphere.hpp"
 #include "hitable/moving_sphere.hpp"
 #include "hitable/hitable_list.hpp"
+#include "hitable/triangle.hpp"
+
 #include "float.h"
 #include "util.hpp"
 #include "hitable/bvh.hpp"
@@ -47,7 +49,7 @@ std::unique_ptr<hitable_list> two_perlin()
 vec3 colour(const geometry::Ray &r, const hitable & world, int depth, const vec3 = vec3{0,0,0})
 {
     hit_record rec;
-    if( world.hit(r, 0.001, MAXFLOAT, rec) )
+    if(world.hit(r, 0.001f, MAXFLOAT, rec) )
     {
         geometry::Ray scattered;
         vec3 atteunation;
@@ -72,7 +74,6 @@ vec3 colour(const geometry::Ray &r, const hitable & world, int depth, const vec3
 std::unique_ptr<bvhNode> random_scene()
 {
     std::vector<hitable_ptr> spherelist;
-
     spherelist.emplace_back(std::make_shared<sphere>( vec3{0, -1000, 0}, 1000,
                                                       std::make_shared<lambertian>(
                                                           std::make_unique<checker_texture>(vec3{0.9, 0.9, 0.9},vec3{0.1 ,0.1, 0.1}))));
@@ -117,6 +118,17 @@ std::unique_ptr<bvhNode> random_scene()
                                                           std::make_unique<const_texture>(vec3{0.9, 0.9, 0.9}))));
     auto bvh_list =std::make_unique<bvhNode>(spherelist.begin(), spherelist.end(), 0.0, 1.0);
     return  bvh_list;
+}
+
+std::unique_ptr<bvhNode> tri_scene()
+{
+    std::vector<hitable_ptr> spherelist;
+    spherelist.emplace_back(std::make_shared<triangle>( vec3{0,0, 0},  vec3{1, 0, 0}, vec3{0, 1, 0},
+                                                        std::make_shared<diffuse_light>(
+                                                            std::make_unique<const_texture>(vec3{0.9, 0.9, 0.9}))));
+    auto bvh_list = std::make_unique<bvhNode>(spherelist.begin(), spherelist.end(), 0.0, 1.0);
+    return  bvh_list;
+
 }
 
 void process_line(const camera &cam,
@@ -182,12 +194,14 @@ int main()
     constexpr  auto ny = 300;
     constexpr auto ns = 16;
 
-    constexpr vec3 lookfrom{13,2,3};
+    // constexpr vec3 lookfrom{13,2,3};
+    // constexpr vec3 lookat{0,0,0};
+    constexpr vec3 lookfrom{0, 0,6};
     constexpr vec3 lookat{0,0,0};
     constexpr float distance_focus = 10.0;
     camera cam(lookfrom, lookat, vec3{0,1,0}, 20, float(nx)/float(ny), 0.00, distance_focus, 0.0, 1.0);
 
-    std::unique_ptr<hitable> world = random_scene();
+    std::unique_ptr<hitable> world =tri_scene();
 
     std::vector<uint8_t> image(nx*ny*4);
 

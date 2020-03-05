@@ -81,3 +81,12 @@ TEST(gemetry_test, point_in_tri)
     EXPECT_EQ(point_in_triangle(a, b, c, vec3{2, 1, 0.0}, 1e-6f), false);
 
 }
+
+TEST(gemetry_test, ray_plane_intersection)
+{
+    using namespace geometry;
+    vec<float, 3> p{0.0, 0.0, 0.0};
+    vec<float, 3> n{0.0, 0.0, 1.0};
+    Ray r( vec<float, 3>{0.0,0.0, 1.0},  vec<float, 3>{0.0,0.0,-1.0});
+    EXPECT_EQ(ray_plane_intersection(r, p, n), 1.0f);
+}
