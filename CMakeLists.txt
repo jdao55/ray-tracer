@@ -66,6 +66,7 @@ include(cmake/Conan.cmake)
 run_conan()
 
 if(ENABLE_TESTING)
+  #adding google test
   add_subdirectory(googletest)
   enable_testing()
   message(
