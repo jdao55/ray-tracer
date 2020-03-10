@@ -3,6 +3,10 @@
 
 #include <random>
 
-float random_float(const float min = 0.0, const float max = 1.0);
+float random_float(const float min = 0.0f, const float max = 1.0f) {
+    static thread_local std::mt19937 generator;
+    std::uniform_real_distribution<float> distribution(min, max);
+    return distribution(generator);
+}
 
 #endif
