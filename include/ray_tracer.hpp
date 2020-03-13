@@ -8,14 +8,18 @@
 #include <utility>
 #include <random>
 #include <taskflow/taskflow.hpp>
+#include <fstream>
+
 #include "geometry/vec.hpp"
 #include "geometry/ray.hpp"
 #include "geometry/camera.hpp"
-#include <fstream>
+
 #include "hitable/sphere.hpp"
 #include "hitable/moving_sphere.hpp"
 #include "hitable/hitable_list.hpp"
 #include "hitable/triangle.hpp"
+#include "hitable/bvh.hpp"
+
 
 #include "float.h"
 #include "util.hpp"

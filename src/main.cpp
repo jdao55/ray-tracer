@@ -4,23 +4,8 @@
 #include <cstdint>
 #include <utility>
 #include <random>
-#include <taskflow/taskflow.hpp>
-#include "geometry/vec.hpp"
-#include "geometry/ray.hpp"
-#include "geometry/camera.hpp"
-#include <fstream>
-#include "hitable/sphere.hpp"
-#include "hitable/moving_sphere.hpp"
-#include "hitable/hitable_list.hpp"
-#include "hitable/triangle.hpp"
 
-#include "float.h"
-#include "util.hpp"
-#include "hitable/bvh.hpp"
-#include "material/material.hpp"
-#include "material/light.hpp"
-#include "../lodepng/lodepng.h"
-#include "ray_tracer.hpp"
+#include "../include/ray_tracer.hpp"
 
 using vec3 = geometry::vec<float,3>;
 using hitable_ptr = std::shared_ptr<hitable>;

@@ -1,6 +1,5 @@
 #include <iostream>
-#include "../geometry/vec.hpp"
-#include "../geometry/geometry_util.hpp"
+#include "../../include/ray_tracer.hpp"
 #include "gtest/gtest.h"
 
 
@@ -87,6 +86,6 @@ TEST(gemetry_test, ray_plane_intersection)
     using namespace geometry;
     vec<float, 3> p{0.0, 0.0, 0.0}; //point on plane
     vec<float, 3> n{0.0, 0.0, 1.0}; //plane normal
-    Ray r( vec<float, 3>{0.0,0.0, 1.0},  vec<float, 3>{0.0,0.0,-1.0}); 
+    Ray r( vec<float, 3>{0.0,0.0, 1.0},  vec<float, 3>{0.0,0.0,-1.0});
     EXPECT_EQ(ray_plane_intersection(r, p, n), 1.0f);
 }
