@@ -1,5 +1,5 @@
 # ray-tracer
-A simple ray tracer implementation (WIP)
+A simple header only ray tracer implementation (WIP)
 ![image created](/img.png?raw=true "Optional Title")
 ## Dependencies and 3rd party libaries 
 - c++11 or higher compiler
