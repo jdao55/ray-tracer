@@ -67,7 +67,7 @@ std::unique_ptr<bvhNode> random_scene()
     spherelist.emplace_back(std::make_shared<sphere>( vec3{0.0f,1.0f,0.0f}, 1.0f, std::make_shared<dielectric>(1.5f)));
     spherelist.emplace_back(std::make_shared<sphere>( vec3{-4.0f,1.0f,0.0f}, 1.0f, std::make_shared<dielectric>(1.5f)));
     // spherelist.emplace_back(std::make_shared<sphere>( vec3{4,1,0}, 1, std::make_shared<metal>(vec3{0.7,0.6,0.5},0.0)));
-    spherelist.emplace_back(std::make_shared<sphere>( vec3{4, 1, 0}, 1,
+    spherelist.emplace_back(std::make_shared<sphere>( vec3{0, 10, 0}, 8,
                                                       std::make_shared<diffuse_light>(
                                                           std::make_unique<const_texture>(vec3{0.9f, 0.9f, 0.9f}))));
     auto bvh_list =std::make_unique<bvhNode>(spherelist.begin(), spherelist.end(), 0.0, 1.0);
@@ -87,14 +87,14 @@ std::unique_ptr<bvhNode> tri_scene()
 int main()
 {
 
-    constexpr auto nx = 400;
-    constexpr auto ny = 300;
-    constexpr auto ns = 8;
+    constexpr auto nx = 800;
+    constexpr auto ny = 600;
+    constexpr auto ns = 256;
 
-    constexpr vec3 lookfrom{13,2,3};
-    constexpr vec3 lookat{0,0,0};
-    //const vec3 lookfrom{0.0f, 0.0f,6.0f};
-    //const vec3 lookat{0.0f,0.0f,0.0f};
+    // constexpr vec3 lookfrom{13,2,3};
+    // constexpr vec3 lookat{0,0,0};
+    const vec3 lookfrom{0.0f, 2.0f,9.0f};
+    const vec3 lookat{0.0f,0.0f,0.0f};
     const float distance_focus = 10.0f;
     camera cam(lookfrom, lookat, vec3{0.0f,1.0f,0.0f}, 20.0f, float(nx)/float(ny), 0.0f, distance_focus, 0.0f, 1.0f);
 
