@@ -24,5 +24,5 @@ A simple header only ray tracer implementation (WIP)
 google test can be run by the executable  
 ``` ./runUnitTests```
 ### Ray tracer
-Currently the tracer creates a static image and can be run with no arguments  
+The current example program generates a static image. 
 ```./ray-tracer``` 
