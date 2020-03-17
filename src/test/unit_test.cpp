@@ -88,4 +88,11 @@ TEST(gemetry_test, ray_plane_intersection)
     vec<float, 3> n{0.0, 0.0, 1.0}; //plane normal
     Ray r( vec<float, 3>{0.0,0.0, 1.0},  vec<float, 3>{0.0,0.0,-1.0});
     EXPECT_EQ(ray_plane_intersection(r, p, n), 1.0f);
+
+
+    vec<float, 3> p2{0.0, 0.0, 5.0}; //point on plane
+    vec<float, 3> n2{0.0, 0.0, 1.0}; //plane normal
+    Ray r2( vec<float, 3>{0.0, 0.0, 10.0},  vec<float, 3>{0.0,-1.0,-1.0});
+    EXPECT_EQ(ray_plane_intersection(r2, p2, n2), 5.0f);
+
 }

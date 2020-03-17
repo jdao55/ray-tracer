@@ -11,7 +11,7 @@ inline vec3 random_in_unit_sphere()
     vec3 p;
     do
     {
-        p = 2.0 * vec3{random_float(), random_float(), random_float()} - vec3{ 1, 1, 1 };
+        p = 2.0 * vec3{ random_float(), random_float(), random_float() } - vec3{ 1, 1, 1 };
     } while (p.square_len() >= 1.0f);
     return p;
 }
@@ -27,7 +27,10 @@ class material
         const hit_record &rec,
         vec3 &atteunation,
         geometry::Ray &scattered) const = 0;
-    virtual vec3 emitted([[maybe_unused]]float u, [[maybe_unused]]float v, [[maybe_unused]] const vec3 &p) const { return vec3{ 0, 0, 0 }; }
+    virtual vec3 emitted([[maybe_unused]] float u, [[maybe_unused]] float v, [[maybe_unused]] const vec3 &p) const
+    {
+        return vec3{ 0, 0, 0 };
+    }
 };
 material::~material() = default;
 
@@ -73,7 +76,7 @@ class metal : public material
 };
 
 
-bool refract(const vec3 &v, const vec3 &n, float ni_over_nt, vec3 &refracted)
+inline bool refract(const vec3 &v, const vec3 &n, float ni_over_nt, vec3 &refracted)
 {
     const vec3 uv = v.unit_vector();
     const float dt = geometry::dot(uv, n);
@@ -99,7 +102,7 @@ class dielectric : public material
         vec3 reflected = reflect(r_in.direction(), rec.normal);
         float ni_over_nt;
         atteunation = vec3{ 1.0f, 1.0f, 1.0f };
-        vec3 refracted;
+        vec3 refracted{1.0f, 1.0f, 1.0f};;
         float cosine;
         float reflect_prob;
         if (geometry::dot(r_in.direction(), rec.normal) > 0.0f)
