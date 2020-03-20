@@ -15,7 +15,7 @@ class triangle : public hitable
     triangle(vec3 a, vec3 b, vec3 c, std::shared_ptr<material> mat)
         : points({ a, b, c }), normal(find_normal()), mat_ptr(mat)
     {}
-    bool hit(const geometry::Ray &r, const float t_min, const float t_max, hit_record &rec) const
+    bool hit(const geometry::Ray &r, const float t_min, const float t_max, hit_record &rec) const override
     {
         auto t = geometry::ray_plane_intersection(r, points[0], normal);
         if (!t.has_value()) return false;
@@ -31,7 +31,7 @@ class triangle : public hitable
         }
         return false;
     }
-    bool bounding_box([[maybe_unused]] float t0, [[maybe_unused]] float t1, aabb &box) const
+    bool bounding_box([[maybe_unused]] float t0, [[maybe_unused]] float t1, aabb &box) const override
     {
         vec3 p1{ std::min({ points[0][0], points[1][0], points[2][0] }),
             std::min({ points[0][1], points[1][1], points[2][1] }),

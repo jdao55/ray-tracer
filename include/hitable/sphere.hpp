@@ -13,7 +13,7 @@ class sphere: public hitable
     std::shared_ptr<material> mat_ptr;
     sphere() {};
     sphere(vec3 cen, float rad, std::shared_ptr<material> mat):center(cen), radius(rad), mat_ptr(mat){}
-    bool hit (const geometry::Ray &r,const  float t_min,const float t_max, hit_record &rec) const
+    bool hit (const geometry::Ray &r,const  float t_min,const float t_max, hit_record &rec) const override
     {
         const vec3 oc = r.origin() -center;
         const float a = geometry::dot(r.direction(), r.direction());
@@ -44,7 +44,7 @@ class sphere: public hitable
         }
         return false;
     }
-    bool bounding_box([[maybe_unused]] float t0, [[maybe_unused]] float t1, aabb& box) const
+    bool bounding_box([[maybe_unused]] float t0, [[maybe_unused]] float t1, aabb& box) const override
     {
         box = aabb(center - vec3{radius, radius, radius}, center + vec3{radius, radius, radius});
         return true;

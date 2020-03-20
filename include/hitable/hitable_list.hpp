@@ -10,7 +10,7 @@ class hitable_list :public hitable
   public:
     std::vector<std::shared_ptr<hitable>> list;
     hitable_list() {}
-    bool hit(const geometry::Ray& r, float t_min, float t_max, hit_record &rec) const
+    bool hit(const geometry::Ray& r, float t_min, float t_max, hit_record &rec) const override
     {
         hit_record temp_rec;
         bool hit_anything = false;
@@ -26,9 +26,9 @@ class hitable_list :public hitable
         }
         return hit_anything;
     }
-    bool bounding_box(float t0, float t1, aabb& box) const
+    bool bounding_box(float t0, float t1, aabb& box) const override
     {
-        if (list.size()<1)
+        if (list.empty())
             return false;
         aabb temp_box;
         bool first_true = list[0]->bounding_box(t0, t1, temp_box);

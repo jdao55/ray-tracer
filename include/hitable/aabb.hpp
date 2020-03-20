@@ -11,7 +11,7 @@ struct aabb
 {
     vec3 _min, _max;
 
-    aabb(){};
+    aabb() = default;
     aabb(const vec3 a, const vec3 b): _min(a), _max(b){}
 
     bool hit(const geometry::Ray &r, float tmin, float tmax) const {
