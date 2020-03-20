@@ -98,7 +98,7 @@ void process_line(const camera &cam,
 
 
 struct task{
-    camera cam;
+    camera &cam;
     hitable &world;
     int row;
     size_t nx;
@@ -107,7 +107,7 @@ struct task{
     std::vector<uint8_t> & image;
 
     task(
-        camera cam_,
+        camera &cam_,
         hitable &world_,
         int row_,
         size_t nx_,
@@ -137,7 +137,7 @@ struct task{
             block_pixels.push_back(255);//alpha
         }
         auto start_index = static_cast<long int>(((ny-1-static_cast<size_t>(row))*nx*4));
-        std::copy(block_pixels.begin(), block_pixels.end(), image.begin()+ start_index);
+        std::copy(block_pixels.begin(), block_pixels.end(), image.begin() + start_index);
     }
 };
 

@@ -80,10 +80,11 @@ class bvhNode : public hitable
         box = surrounding_box(box_left, box_right);
     }
 
-    bool hit(const ray& r, const float tmin, const float tmax, hit_record & rec) const
+    bool hit(const ray& r, const float tmin, const float tmax, hit_record & rec) const override
     {
         if (box.hit(r, tmin, tmax)) {
-            hit_record left_rec, right_rec;
+            hit_record left_rec;
+            hit_record right_rec;
             const bool hit_left = left->hit(r, tmin, tmax, left_rec);
             const bool hit_right = right->hit(r, tmin, tmax, right_rec);
             if (hit_left && hit_right) {
@@ -107,7 +108,8 @@ class bvhNode : public hitable
         else return false;
     }
 
-    bool bounding_box([[maybe_unused]] float t0, [[maybe_unused]] float t1, aabb& box1) const {
+    bool bounding_box([[maybe_unused]] float t0, [[maybe_unused]] float t1, aabb& box1) const override
+    {
         box1=box;
         return true;
     }

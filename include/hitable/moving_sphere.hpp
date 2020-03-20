@@ -17,7 +17,7 @@ class moving_sphere: public hitable
             radius(rad),
             mat_ptr(m) {}
 
-    bool hit (const geometry::Ray &r, float t_min, float t_max, hit_record &rec) const
+    bool hit (const geometry::Ray &r, float t_min, float t_max, hit_record &rec) const override
     {
         const vec3 oc = r.origin() -center(r.time);
         const float a = geometry::dot(r.direction(), r.direction());
@@ -49,7 +49,7 @@ class moving_sphere: public hitable
         return false;
     }
 
-    bool bounding_box(float t0, float t1, aabb& box) const
+    bool bounding_box(float t0, float t1, aabb& box) const override
     {
         aabb box0(center(t0) - vec3{radius, radius, radius}, center(t0) + vec3{radius, radius, radius});
         aabb box1(center(t1) - vec3{radius, radius, radius}, center(t1) + vec3{radius, radius, radius});

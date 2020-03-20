@@ -22,25 +22,30 @@ inline vec3 reflect(const vec3 &v, const vec3 &n) { return v - n * 2 * (geometry
 class material
 {
   public:
-    virtual ~material() = 0;
+    material() = default;
+    material& operator=(const material &) = delete;
+    material(const material &) = delete;
+    virtual ~material() = default;
+
     virtual bool scatter(const geometry::Ray &r_in,
         const hit_record &rec,
         vec3 &atteunation,
         geometry::Ray &scattered) const = 0;
+
     virtual vec3 emitted([[maybe_unused]] float u, [[maybe_unused]] float v, [[maybe_unused]] const vec3 &p) const
     {
         return vec3{ 0, 0, 0 };
     }
 };
-material::~material() = default;
-
 
 class lambertian : public material
 {
   public:
     lambertian(std::unique_ptr<texture> a) : albedo(std::move(a)){};
-    virtual bool
-        scatter(const geometry::Ray &r_in, const hit_record &rec, vec3 &atteunation, geometry::Ray &scattered) const
+    bool scatter(const geometry::Ray &r_in,
+        const hit_record &rec,
+        vec3 &atteunation,
+        geometry::Ray &scattered) const override
     {
         const vec3 target = rec.p + rec.normal + random_in_unit_sphere();
         scattered = geometry::Ray(rec.p, target - rec.p, r_in.time);
@@ -62,8 +67,10 @@ class metal : public material
         else
             fuzz = 1;
     };
-    virtual bool
-        scatter(const geometry::Ray &r_in, const hit_record &rec, vec3 &atteunation, geometry::Ray &scattered) const
+    bool scatter(const geometry::Ray &r_in,
+        const hit_record &rec,
+        vec3 &atteunation,
+        geometry::Ray &scattered) const override
     {
         const vec3 reflected = reflect(r_in.direction().unit_vector(), rec.normal);
         scattered = geometry::Ray(rec.p, reflected + fuzz * random_in_unit_sphere());
@@ -95,14 +102,16 @@ class dielectric : public material
   public:
     float ref_index;
     dielectric(float ri) : ref_index(ri) {}
-    virtual bool
-        scatter(const geometry::Ray &r_in, const hit_record &rec, vec3 &atteunation, geometry::Ray &scattered) const
+    bool scatter(const geometry::Ray &r_in,
+        const hit_record &rec,
+        vec3 &atteunation,
+        geometry::Ray &scattered) const override
     {
         vec3 outward_normal;
         vec3 reflected = reflect(r_in.direction(), rec.normal);
         float ni_over_nt;
         atteunation = vec3{ 1.0f, 1.0f, 1.0f };
-        vec3 refracted{1.0f, 1.0f, 1.0f};;
+        vec3 refracted{ 1.0f, 1.0f, 1.0f };
         float cosine;
         float reflect_prob;
         if (geometry::dot(r_in.direction(), rec.normal) > 0.0f)
