@@ -3,49 +3,35 @@
 
 #include "hitable.hpp"
 #include "../util.hpp"
+#include <memory>
 #include <vector>
 #include <algorithm>
 using vec3 = geometry::vec<float,3>;
 using ray = geometry::Ray;
-using hitable_ptr = std::shared_ptr<hitable>;
+using hitable_ptr = std::unique_ptr<hitable>;
 
-inline bool box_cmp(const hitable & a, const hitable &b, int dim);
+enum axis{
+    x = 0,
+    y = 1,
+    z = 2
+};
+inline bool box_cmp(const hitable_ptr& a, const hitable_ptr &b,const  axis dim){
+    aabb box_left;
+    aabb box_right;
 
-inline auto box_x_compare (const hitable_ptr &a, const hitable_ptr & b)
-{
-    aabb box_left, box_right;
-
-    if(!a->bounding_box(0.0f, 0.0f, box_left) || !b->bounding_box(0.0f, 0.0f, box_right))
+    if(!a->bounding_box(0.0F, 0.0F, box_left) || !b->bounding_box(0.0F, 0.0F, box_right))
         std::cerr << "no bounding box in bvh_node constructor\n";
 
-    return  ( box_right._min[0] - box_left._min[0] < 0.0f  );
+    return  ( box_right._min[dim] - box_left._min[dim] < 0.0f  );
 }
 
-inline auto box_y_compare (const hitable_ptr &a, const hitable_ptr & b)
-{
-    aabb box_left, box_right;
-
-    if(!a->bounding_box(0.0f,0.0f, box_left) || !b->bounding_box(0.0f,0.0f, box_right))
-        std::cerr << "no bounding box in bvh_node constructor\n";
-
-    return  ( box_right._min[1] - box_left._min[1] < 0.0f  );
-}
-
-inline auto box_z_compare (const hitable_ptr &a, const hitable_ptr & b)
-{
-    aabb box_left, box_right;
-
-    if(!a->bounding_box(0.0f,0.0f, box_left) || !b->bounding_box(0.0f,0.0f, box_right))
-        std::cerr << "no bounding box in bvh_node constructor\n";
-
-    return  ( box_right._min[2] - box_left._min[2] < 0.0f  );
-}
 
 class bvhNode : public hitable
 {
   private:
   public:
-    hitable_ptr left, right;
+    hitable_ptr left=nullptr;
+    hitable_ptr right=nullptr;
     aabb box;
     bvhNode(){};
 
@@ -53,59 +39,54 @@ class bvhNode : public hitable
     bvhNode (hitable_iter list_begin,  hitable_iter list_end, float time0, float time1)
     {
         const auto n = std::distance(list_begin, list_end);
-        const size_t axis = static_cast<size_t>(3.0f*random_float());
-        if (axis == 0)
-            std::sort(list_begin, list_end, box_x_compare);
-        else if (axis == 1){
-            std::sort(list_begin, list_end, box_y_compare);
-        }
-        else
-            std::sort(list_begin, list_end, box_z_compare);
+        const axis dim = static_cast<axis>(random_int(0,2));
 
-        if (n == 1) {
-            left = right = *list_begin;
+        switch (n){
+            case 1:
+                left = std::move(*list_begin);
+                right = nullptr;
+                break;
+            case 2:
+                if(box_cmp(*list_begin, *(list_begin+1), dim))
+                {
+                    left = std::move(*list_begin);
+                    right =  std::move(*(list_begin+1));
+                }
+                else {
+                    left =std::move( *(list_begin+1));
+                    right =std::move(*list_begin);
+                }
+                break;
+            default:
+                std::sort(list_begin, list_end, [dim](const auto &a, const auto &b){
+                                                    return box_cmp(a,b,dim);
+                                                });
+                left = std::make_unique<bvhNode>(list_begin, list_begin+n/2, time0, time1);
+                right = std::make_unique<bvhNode>(list_begin+n/2, list_end, time0, time1);
+                break;
+        };
+        aabb box_left;
+        aabb box_right;
+        left->bounding_box(time0,time1, box_left);
+        if(right){
+            right->bounding_box(time0,time1, box_right);
         }
-        else if (n == 2) {
-            left = *(list_begin);
-            right = *(list_begin+1);
-        }
-        else {
-            left = std::make_shared<bvhNode>(list_begin, list_begin+n/2, time0, time1);
-            right = std::make_shared<bvhNode>(list_begin+n/2, list_end, time0, time1);
+        else{
+            box_right=box_left;
         }
 
-        aabb box_left, box_right;
-        if(!left->bounding_box(time0,time1, box_left) || !right->bounding_box(time0,time1, box_right))
-            std::cerr << "no bounding box in bvh_node constructor\n";
         box = surrounding_box(box_left, box_right);
     }
 
     bool hit(const ray& r, const float tmin, const float tmax, hit_record & rec) const override
     {
-        if (box.hit(r, tmin, tmax)) {
-            hit_record left_rec;
-            hit_record right_rec;
-            const bool hit_left = left->hit(r, tmin, tmax, left_rec);
-            const bool hit_right = right->hit(r, tmin, tmax, right_rec);
-            if (hit_left && hit_right) {
-                if (left_rec.t < right_rec.t)
-                    rec = left_rec;
-                else
-                    rec = right_rec;
-                return true;
-            }
-            else if (hit_left) {
-                rec = left_rec;
-                return true;
-            }
-            else if (hit_right) {
-                rec = right_rec;
-                return true;
-            }
-            else
-                return false;
-        }
-        else return false;
+        if (!box.hit(r, tmin, tmax))
+        return false;
+
+        bool hit_left = left?left->hit(r, tmin, tmax, rec):false;
+        bool hit_right = right? right->hit(r, tmin, hit_left ? rec.t : tmax, rec):false;
+
+        return hit_left || hit_right;
     }
 
     bool bounding_box([[maybe_unused]] float t0, [[maybe_unused]] float t1, aabb& box1) const override

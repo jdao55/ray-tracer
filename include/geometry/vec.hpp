@@ -17,7 +17,7 @@ namespace geometry
         constexpr const vec& operator+(){return *this;}
         constexpr const vec& operator-(){return vec{-e[0],-e[1],-e[2]};}
         constexpr T& operator[](size_t i) {return e[i];}
-        constexpr T operator[](size_t i) const {return e[i];}
+        constexpr const T& operator[](size_t i) const {return e[i];}
 
         constexpr vec& operator+=(const vec &v2)
         {
@@ -104,6 +104,7 @@ namespace geometry
 
         inline std::ostream& operator<<(std::ostream &os)
         {
+            os<<"vec: ";
             for(size_t i=0; i<n; i++)
             {
                 os << e[i]<<" ";
@@ -157,7 +158,7 @@ namespace geometry
 
         constexpr vec operator/(const vec &v2) const
         {
-            std::array<T,n> temp{0.0};
+            std::array<T,n> temp{};
             for(size_t i=0; i<n; i++)
             {
                 temp[i] = e[i] / v2.e[i];

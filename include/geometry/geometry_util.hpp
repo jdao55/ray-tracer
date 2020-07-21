@@ -34,10 +34,10 @@ namespace geometry {
 
     inline std::optional<float> ray_plane_intersection(const geometry::Ray &r, vec3 p_point, vec3 p_normal)
     {
-        auto denominator = geometry::dot(p_normal, r.B);
+        auto denominator = geometry::dot(p_normal, r.dir);
         if (fabs(denominator) > 1e-6f)
         {
-            auto p0l0 = p_point - r.A;
+            auto p0l0 = p_point - r.orig;
             auto t = geometry::dot(p0l0, p_normal)/denominator;
             return t;
         }

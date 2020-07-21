@@ -29,71 +29,73 @@
 #include "../lodepng/lodepng.h"
 
 using vec3 = geometry::vec<float,3>;
-using hitable_ptr = std::shared_ptr<hitable>;
 
 
 constexpr uint8_t tocolor(const float n)
 {
-    return uint8_t(255.9f * sqrt(n));
+    return uint8_t(256 * clamp(n, 0.0F, 0.999F));
 }
 
 
-//TODO get rid of recursive call
-inline vec3 colour(const geometry::Ray &r, const hitable & world, int depth, const vec3 = vec3{0.0f,0.0f,0.0f})
+inline vec3 ray_colour(const geometry::Ray &r, const hitable & world, int depth, const vec3 background= vec3{0.0f,0.0f,0.0f})
 {
     hit_record rec;
-    if(world.hit(r, 0.001f, MAXFLOAT, rec) )
+    vec3 col{0.0F, 0.0F, 0.0F};
+    geometry::Ray cur_ray = r;
+    vec3 curr_attenuation{1.0F, 1.0F, 1.0F};
+    int i=0;
+    geometry::Ray scattered;
+    vec3 attenuation;
+    while(i<depth && world.hit(cur_ray, 0.001F, MAXFLOAT, rec))
     {
-        geometry::Ray scattered;
-        vec3 atteunation;
         vec3 emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
-        if (depth < 50 && rec.mat_ptr->scatter(r, rec, atteunation, scattered))
+        if(!rec.mat_ptr->scatter(cur_ray, rec, attenuation, scattered))
         {
-            //TODO refactor recursive call
-            return emitted + atteunation*colour(scattered, world, depth+1 );
+            col += emitted*curr_attenuation;
+            break;
         }
-        else
-        {
-            return emitted;
-        }
-
+        col += emitted * curr_attenuation;
+        cur_ray = scattered;
+        curr_attenuation = attenuation*curr_attenuation;
+        i++;
     }
-    else
-    {
-        return vec3{0,0,0};
-    }
-}
+    // for(auto i=0;i < depth; i++)
+    // {
+    //     if(!world.hit(cur_ray, 0.001F, MAXFLOAT, rec)){
+    //        break;
+    //     }
 
+    //     geometry::Ray scattered;
+    //     vec3 attenuation;
+    //     vec3 emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+    //     if(!rec.mat_ptr->scatter(cur_ray, rec, attenuation, scattered))
+    //     {
+    //         col += emitted*curr_attenuation;;
+    //         break;
+    //     }
+    //     col += emitted;
+    //     cur_ray = scattered;
+    //     curr_attenuation = attenuation*curr_attenuation;
+    // }
+     return col;
+    // if(depth<=0){
+    //     return vec3{0.0F,0.0F, 0.0F};
+    // }
+    // hit_record rec;
+    // if(!world.hit(r, 0.001f, MAXFLOAT, rec) )
+    // {
 
-void process_line(const camera &cam,
-                  const hitable & world,
-                  const int start_row,
-                  const size_t nx, const size_t ny,
-                  const size_t samples,
-                  std::vector<uint8_t> & image)
-{
-    std::vector<uint8_t> block_pixels;
-    block_pixels.reserve(nx*4);
-    for (size_t i = 0 ; i < nx ; i++)
-    {
-        vec3 col{0,0,0};
-        for(size_t s=0; s < samples; s++)
-        {
-            const float u = (static_cast<float>(i)+random_float())/float(nx);
-            const float v = (static_cast<float>(start_row)+random_float())/float(ny);
-            const geometry::Ray r=cam.get_ray(u,v);
+    //     return background;
+    // }
 
-            col += colour(r, world, 0);
-
-        }
-        col /= float(samples);
-        block_pixels.push_back(tocolor(col[0])); //red
-        block_pixels.push_back(tocolor(col[1]));//green
-        block_pixels.push_back(tocolor(col[2]));//blue
-        block_pixels.push_back(255);//alpha
-    }
-    auto start_index = static_cast<long int>(((ny-1-static_cast<size_t>(start_row))*nx*4));
-    std::copy(block_pixels.begin(), block_pixels.end(), image.begin()+ start_index);
+    // geometry::Ray scattered;
+    // vec3 atteunation;
+    // vec3 emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+    // if (!rec.mat_ptr->scatter(r, rec, atteunation, scattered))
+    // {
+    //     return emitted;
+    // }
+    // return emitted+ atteunation*ray_colour(scattered, world, depth-1 );
 }
 
 
@@ -115,6 +117,7 @@ struct task{
         size_t samples_,
         std::vector<uint8_t> & image_):
         cam(cam_), world(world_), row(row_), nx(nx_), ny(ny_), samples(samples_), image(image_){}
+
     void operator()() {
         std::vector<uint8_t> block_pixels;
         block_pixels.reserve(nx*4);
@@ -127,7 +130,7 @@ struct task{
                 const float v = (static_cast<float>(row)+random_float())/float(ny);
                 const geometry::Ray r=cam.get_ray(u,v);
 
-                col += colour(r, world, 0);
+                col += ray_colour(r, world, 50);
 
             }
             col /= float(samples);

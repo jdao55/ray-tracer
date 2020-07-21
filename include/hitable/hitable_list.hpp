@@ -8,7 +8,7 @@
 class hitable_list :public hitable
 {
   public:
-    std::vector<std::shared_ptr<hitable>> list;
+    std::vector<std::unique_ptr<hitable>> list;
     hitable_list() {}
     bool hit(const geometry::Ray& r, float t_min, float t_max, hit_record &rec) const override
     {
@@ -28,27 +28,17 @@ class hitable_list :public hitable
     }
     bool bounding_box(float t0, float t1, aabb& box) const override
     {
-        if (list.empty())
-            return false;
+        if (list.empty()) return false;
+
         aabb temp_box;
-        bool first_true = list[0]->bounding_box(t0, t1, temp_box);
-        if (!first_true)
-        {
-            return true;
+        bool first_box = true;
+
+        for (const auto& object : list) {
+            if (!object->bounding_box(t0, t1, temp_box)) return false;
+            box = first_box ? temp_box : surrounding_box(box, temp_box);
+            first_box = false;
         }
-        else
-        {
-            box  = temp_box;
-        }
-        for (size_t i =0; i<list.size(); i++)
-        {
-            if(list[0]->bounding_box(t0, t1, temp_box))
-            {
-                box = surrounding_box(box, temp_box);
-            }
-            else
-                return false;
-        }
+
         return true;
 
     }

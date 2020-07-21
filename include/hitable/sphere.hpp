@@ -10,9 +10,10 @@ class sphere: public hitable
   public:
     vec3 center;
     float radius;
-    std::shared_ptr<material> mat_ptr;
+    std::unique_ptr<material> mat_ptr;
     sphere() {};
-    sphere(vec3 cen, float rad, std::shared_ptr<material> mat):center(cen), radius(rad), mat_ptr(mat){}
+    sphere(vec3 cen, float rad, std::unique_ptr<material> mat):center(cen), radius(rad), mat_ptr(std::move(mat)){}
+
     bool hit (const geometry::Ray &r,const  float t_min,const float t_max, hit_record &rec) const override
     {
         const vec3 oc = r.origin() -center;
@@ -28,7 +29,7 @@ class sphere: public hitable
                 rec.t = temp;
                 rec.p = r.point_at_parameter(rec.t);
                 rec.normal = (rec.p -center) /radius;
-                rec.mat_ptr= mat_ptr;
+                rec.mat_ptr= mat_ptr.get();
                 return true;
 
             }
@@ -38,7 +39,7 @@ class sphere: public hitable
                 rec.t = temp;
                 rec.p = r.point_at_parameter(rec.t);
                 rec.normal = (rec.p -center) /radius;
-                rec.mat_ptr = mat_ptr;
+                rec.mat_ptr = mat_ptr.get();
                 return true;
             }
         }

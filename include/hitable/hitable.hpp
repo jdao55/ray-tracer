@@ -17,7 +17,7 @@ struct hit_record
     float v;
     vec3 p;
     vec3 normal;
-    std::shared_ptr<material> mat_ptr;
+    material* mat_ptr;
 
 };
 
@@ -28,24 +28,8 @@ class hitable
     virtual bool bounding_box(float t0, float t1, aabb& box) const = 0;
     hitable() = default;
     virtual ~hitable() = default;
-    hitable &operator=(const hitable &) = delete;
-    hitable(const hitable &) = delete;
+    //hitable &operator=(const hitable &) = delete;
+    //hitable(const hitable &) = delete;
 };
-//inline hitable::~hitable() = default;
-
-inline aabb surrounding_box(const aabb box0,const aabb box1)
-{
-    vec3 small{ffmin(box0._min[0], box1._min[0]),
-               ffmin(box0._min[1], box1._min[1]),
-               ffmin(box0._min[2], box1._min[2])
-
-    };
-    vec3 large{ffmax(box0._min[0], box1._min[0]),
-               ffmax(box0._min[1], box1._min[1]),
-               ffmax(box0._min[2], box1._min[2])
-
-    };
-    return aabb{small, large};
-}
 
 #endif

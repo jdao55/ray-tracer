@@ -11,9 +11,10 @@ class triangle : public hitable
   public:
     std::array<vec3, 3> points;
     vec3 normal;
-    std::shared_ptr<material> mat_ptr;
-    triangle(vec3 a, vec3 b, vec3 c, std::shared_ptr<material> mat)
-        : points({ a, b, c }), normal(find_normal()), mat_ptr(mat)
+    std::unique_ptr<material> mat_ptr;
+
+    triangle(vec3 a, vec3 b, vec3 c, std::unique_ptr<material> mat)
+        : points({ a, b, c }), normal(find_normal()), mat_ptr(std::move(mat))
     {}
     bool hit(const geometry::Ray &r, const float t_min, const float t_max, hit_record &rec) const override
     {
@@ -26,7 +27,7 @@ class triangle : public hitable
             rec.p = p;
             rec.t = t.value();
             rec.normal = normal;
-            rec.mat_ptr = mat_ptr;
+            rec.mat_ptr = mat_ptr.get();
             return true;
         }
         return false;

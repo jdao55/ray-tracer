@@ -7,29 +7,27 @@
 
 #include "../include/ray_tracer.hpp"
 
-using vec3 = geometry::vec<float,3>;
-using hitable_ptr = std::shared_ptr<hitable>;
 
 
 std::unique_ptr<hitable_list> two_perlin()
 {
     auto world_list = std::make_unique<hitable_list>();
-    world_list->list.emplace_back(std::make_shared<sphere>(
+    world_list->list.emplace_back(std::make_unique<sphere>(
         vec3{0.0f,-1000.0f,0.0f},
         1000.0f,
-        std::make_shared<lambertian>(std::make_unique<noise_texture>(4))));
-    world_list->list.emplace_back(std::make_shared<sphere>(
+        std::make_unique<lambertian>(std::make_unique<noise_texture>(4))));
+    world_list->list.emplace_back(std::make_unique<sphere>(
         vec3{0.0f, 2.0f, 0.0f},
         2,
-        std::make_shared<lambertian>(std::make_unique<noise_texture>(4))));
+        std::make_unique<lambertian>(std::make_unique<noise_texture>(4))));
     return world_list;
 }
 
 std::unique_ptr<bvhNode> random_scene()
 {
     std::vector<hitable_ptr> spherelist;
-    spherelist.emplace_back(std::make_shared<sphere>( vec3{0.0f, -1000.0f, 0.0f}, 1000.0f,
-                                                      std::make_shared<lambertian>(
+    spherelist.emplace_back(std::make_unique<sphere>( vec3{0.0f, -1000.0f, 0.0f}, 1000.0f,
+                                                      std::make_unique<lambertian>(
                                                           std::make_unique<checker_texture>(vec3{0.9f, 0.9f, 0.9f},vec3{0.1f ,0.1f, 0.1f}))));
 
     for(int a=-8; a<8; a++)
@@ -40,36 +38,36 @@ std::unique_ptr<bvhNode> random_scene()
             vec3 center{a+0.9f*random_float(), 0.2f, b+0.9f*random_float()};
             if ((center - vec3{4.0f, 0.2f, 0.0f}).length() > 0.9f)
             {
-                if( choose_mat <0.8f)
-                    spherelist.emplace_back(std::make_shared<moving_sphere>( center, center+ vec3{0.0f, 0.5f* random_float(), 0},
+                if( choose_mat <0.3f)
+                    spherelist.emplace_back(std::make_unique<moving_sphere>( center, center+ vec3{0.0f, 0.5f* random_float(), 0},
                                                                              0.0f, 1.0f, 0.2f,
-                                                                             std::make_shared<lambertian>(
+                                                                             std::make_unique<lambertian>(
                                                                                  std::make_unique<const_texture>(
                                                                                      vec3{random_float()*random_float(),
                                                                                           random_float()*random_float(),
                                                                                           random_float()*random_float()}))));
-                else if(choose_mat < 0.95)
+                else if(choose_mat < 0.5)
                 {
-                    spherelist.emplace_back(std::make_shared<sphere>(center, 0.2f,
-                                                                     std::make_shared<metal>(vec3{0.5f*(1+random_float()),
+                    spherelist.emplace_back(std::make_unique<sphere>(center, 0.2f,
+                                                                     std::make_unique<metal>(vec3{0.5f*(1+random_float()),
                                                                                                   0.5f*(1+random_float()),
                                                                                                   0.5f*(1+random_float())},
                                                                          0.5f*random_float())));
                 }
                 else {
-                    spherelist.emplace_back(std::make_shared<sphere>( center, 0.2f, std::make_shared<dielectric>(1.5f)));
+                    spherelist.emplace_back(std::make_unique<sphere>( center, 0.2f, std::make_unique<dielectric>(1.5f)));
 
                 }
             }
         }
     }
 
-    spherelist.emplace_back(std::make_shared<sphere>( vec3{0.0f,1.0f,0.0f}, 1.0f, std::make_shared<dielectric>(1.5f)));
-    spherelist.emplace_back(std::make_shared<sphere>( vec3{-4.0f,1.0f,0.0f}, 1.0f, std::make_shared<dielectric>(1.5f)));
-    // spherelist.emplace_back(std::make_shared<sphere>( vec3{4,1,0}, 1, std::make_shared<metal>(vec3{0.7,0.6,0.5},0.0)));
-    spherelist.emplace_back(std::make_shared<sphere>( vec3{0, 10, 0}, 8,
-                                                      std::make_shared<diffuse_light>(
-                                                          std::make_unique<const_texture>(vec3{0.9f, 0.9f, 0.9f}))));
+    spherelist.emplace_back(std::make_unique<sphere>( vec3{0.0f,1.0f,0.0f}, 1.0f, std::make_unique<dielectric>(1.5f)));
+    spherelist.emplace_back(std::make_unique<sphere>( vec3{-4.0f,1.0f,0.0f}, 1.0f, std::make_unique<dielectric>(1.5f)));
+    // spherelist.emplace_back(std::make_unique<sphere>( vec3{4,1,0}, 1, std::make_unique<metal>(vec3{0.7,0.6,0.5},0.0)));
+    spherelist.emplace_back(std::make_unique<sphere>( vec3{0, 12, 0}, 10,
+                                                      std::make_unique<diffuse_light>(
+                                                          std::make_unique<const_texture>(vec3{1.0f, 1.0f, 1.0f}))));
     auto bvh_list =std::make_unique<bvhNode>(spherelist.begin(), spherelist.end(), 0.0, 1.0);
     return  bvh_list;
 }
@@ -77,9 +75,16 @@ std::unique_ptr<bvhNode> random_scene()
 std::unique_ptr<bvhNode> tri_scene()
 {
     std::vector<hitable_ptr> spherelist;
-    spherelist.emplace_back(std::make_shared<triangle>( vec3{0.0f,0.0f, 0.0f},  vec3{1.0f, 0.0f, 0.0f}, vec3{0.0f, 1.0f, 0.0f},
-                                                        std::make_shared<diffuse_light>(
-                                                            std::make_unique<const_texture>(vec3{0.9f, 0.9f, 0.9f}))));
+    spherelist.emplace_back(std::make_unique<triangle>( vec3{0.0f,0.0f, 0.0f},  vec3{1.0f, 0.0f, 0.0f}, vec3{0.0f, 1.0f, 0.0f},
+                                                        std::make_unique<diffuse_light>(
+                                                            std::make_unique<const_texture>(vec3{10.4f, 5.9f, 10.9f}))));
+
+    spherelist.emplace_back(std::make_unique<triangle>( vec3{0.0f,0.0f, -2.0f},  vec3{2.2f, 1.0f, -2.0f}, vec3{-1.2f, -2.0f, -0.1f},
+                                                        std::make_unique<lambertian>(std::make_unique<const_texture>(vec3{0.8F, 0.5F, 0.9F}))));
+
+         spherelist.emplace_back(std::make_unique<sphere>( vec3{0.0f, -1000.0f, 0.0f}, 1000.0f,
+                                                      std::make_unique<lambertian>(
+                                                          std::make_unique<checker_texture>(vec3{0.9f, 0.9f, 0.9f},vec3{0.1f ,0.1f, 0.1f}))));
     auto bvh_list = std::make_unique<bvhNode>(spherelist.begin(), spherelist.end(), 0.0f, 1.0f);
     return  bvh_list;
 }
@@ -87,8 +92,8 @@ std::unique_ptr<bvhNode> tri_scene()
 int main()
 {
 
-    constexpr auto nx = 800;
-    constexpr auto ny = 600;
+    constexpr auto nx = 400;
+    constexpr auto ny = 300;
     constexpr auto ns = 256;
 
     // constexpr vec3 lookfrom{13,2,3};

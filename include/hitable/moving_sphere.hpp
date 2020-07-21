@@ -7,15 +7,15 @@ class moving_sphere: public hitable
   public:
     vec3 center0, center1;
     float time0, time1, radius;
-    std::shared_ptr<material> mat_ptr;
+    std::unique_ptr<material> mat_ptr;
 
 
     moving_sphere(){};
-    moving_sphere(vec3 cen0, vec3 cen1, float t0, float t1, float rad, std::shared_ptr<material> m):
+    moving_sphere(vec3 cen0, vec3 cen1, float t0, float t1, float rad, std::unique_ptr<material> m):
             center0(cen0), center1(cen1),
             time0(t0), time1(t1),
             radius(rad),
-            mat_ptr(m) {}
+            mat_ptr(std::move(m)) {}
 
     bool hit (const geometry::Ray &r, float t_min, float t_max, hit_record &rec) const override
     {
@@ -32,7 +32,7 @@ class moving_sphere: public hitable
                 rec.t = temp;
                 rec.p = r.point_at_parameter(rec.t);
                 rec.normal = (rec.p -center(r.time)) /radius;
-                rec.mat_ptr= mat_ptr;
+                rec.mat_ptr= mat_ptr.get();
                 return true;
 
             }
@@ -42,7 +42,7 @@ class moving_sphere: public hitable
                 rec.t = temp;
                 rec.p = r.point_at_parameter(rec.t);
                 rec.normal = (rec.p - center(r.time)) /radius;
-                rec.mat_ptr = mat_ptr;
+                rec.mat_ptr = mat_ptr.get();
                 return true;
             }
         }
